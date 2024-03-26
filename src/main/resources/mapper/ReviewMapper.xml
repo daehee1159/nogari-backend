@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.msm.nogari.core.mapper.ReviewMapper">
+    <insert id="setReview" parameterType="com.msm.nogari.core.dto.board.review.ReviewBoardDto">
+        INSERT INTO nogari_review.board
+        (
+            title, rank, period, atmosphere, content,
+            memberSeq, nickname,
+            regDt
+        )
+        VALUES
+            (
+                #{title}, #{rank}, #{period}, #{atmosphere}, #{content},
+                #{memberSeq}, #{nickname},
+                NOW()
+            )
+    </insert>
+
+    <select id="getAllReview" resultType="com.msm.nogari.core.dto.board.review.ReviewBoardDto">
+        SELECT
+            b.boardSeq,
+            b.title,
+            b.rank,
+            b.period,
+            b.atmosphere,
+            b.content,
+            b.memberSeq,
+            b.nickname,
+            b.viewCnt,
+            b.regDt,
+            b.hotYN,
+            b.noticeYN,
+            b.deleteYN,
+            COUNT(bl.boardSeq) AS likeCnt
+        FROM nogari_review.board b
+                 LEFT JOIN nogari_review.board_like bl ON b.boardSeq = bl.boardSeq
+        WHERE b.deleteYN = 'N'
+        GROUP BY b.boardSeq, b.title, b.content, b.regDt, b.deleteYN
+        ORDER BY b.regDt DESC
+    </select>
+
+    <select id="getLikeReview" resultType="com.msm.nogari.core.dto.board.review.ReviewBoardDto">
+        SELECT
+            *
+        FROM nogari_review.board WHERE deleteYN = 'N' AND likeCnt >= #{likeCount} ORDER BY regDt DESC
+    </select>
+
+    <select id="getNoticeReview" resultType="com.msm.nogari.core.dto.board.review.ReviewBoardDto">
+        SELECT
+            *
+        FROM nogari_review.board WHERE deleteYN = 'N' AND noticeYN = 'Y' ORDER BY regDt DESC
+    </select>
+
+    <select id="searchReviewBoard" parameterType="map" resultType="com.msm.nogari.core.dto.board.review.ReviewBoardDto">
+        SELECT
+        *
+        FROM nogari_review.board
+        <where>
+            <if test="searchCondition == 'title'">
+                AND title LIKE CONCAT('%', #{keyword}, '%') AND deleteYN = 'N'
+            </if>
+            <if test="searchCondition == 'titleContent'">
+                AND (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%')) AND deleteYN = 'N'
+            </if>
+            <if test="searchCondition == 'content'">
+                AND content LIKE CONCAT('%', #{keyword}, '%') AND deleteYN = 'N'
+            </if>
+            <if test="searchCondition == 'nickname'">
+                AND memberSeq = #{keyword} AND deleteYN = 'N'
+            </if>
+        </where>
+    </select>
+
+    <select id="searchLikeReviewBoard" parameterType="map" resultType="com.msm.nogari.core.dto.board.review.ReviewBoardDto">
+        SELECT
+        *
+        FROM nogari_review.board
+        <where>
+            <if test="searchCondition == 'title'">
+                AND title LIKE CONCAT('%', #{keyword}, '%') AND deleteYN = 'N'
+            </if>
+            <if test="searchCondition == 'titleContent'">
+                AND (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%')) AND deleteYN = 'N'
+            </if>
+            <if test="searchCondition == 'content'">
+                AND content LIKE CONCAT('%', #{keyword}, '%') AND deleteYN = 'N'
+            </if>
+            <if test="searchCondition == 'nickname'">
+                AND memberSeq = #{keyword} AND deleteYN = 'N' AND likeCnt >= #{likeCount}
+            </if>
+        </where>
+    </select>
+
+    <select id="searchNoticeReviewBoard" parameterType="map" resultType="com.msm.nogari.core.dto.board.review.ReviewBoardDto">
+        SELECT
+        *
+        FROM nogari_review.board
+        <where>
+            <if test="searchCondition == 'title'">
+                AND title LIKE CONCAT('%', #{keyword}, '%') AND deleteYN = 'N'
+            </if>
+            <if test="searchCondition == 'titleContent'">
+                AND (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%')) AND deleteYN = 'N'
+            </if>
+            <if test="searchCondition == 'content'">
+                AND content LIKE CONCAT('%', #{keyword}, '%') AND deleteYN = 'N'
+            </if>
+            <if test="searchCondition == 'nickname'">
+                AND memberSeq = #{keyword} AND deleteYN = 'N' AND noticeYN = 'Y'
+            </if>
+        </where>
+    </select>
+
+    <select id="getCntOfComment" parameterType="Long" resultType="java.lang.Integer">
+        SELECT
+            COUNT(*)
+        FROM
+            nogari_review.comment
+        WHERE
+            boardSeq = #{boardSeq} AND deleteYN = 'N'
+    </select>
+
+    <select id="getReviewByIdx" parameterType="Long" resultType="com.msm.nogari.core.dto.board.review.ReviewBoardDto">
+        SELECT
+            *
+        FROM nogari_review.board
+        WHERE boardSeq = #{boardSeq} AND deleteYN = 'N' ORDER BY startDt DESC
+    </select>
+
+    <select id="getReview" parameterType="Long" resultType="com.msm.nogari.core.dto.board.review.ReviewBoardDto">
+        SELECT
+            *
+        FROM nogari_review.board
+        WHERE memberSeq = #{memberSeq} AND deleteYN = 'N'
+    </select>
+
+    <update id="updateReview" parameterType="com.msm.nogari.core.dto.board.review.ReviewBoardDto">
+        UPDATE nogari_review.board
+        SET
+        title = #{title},
+        rank = #{rank},
+        period = #{period},
+        atmosphere = #{atmosphere},
+        content = #{content},
+        modDt = NOW()
+        WHERE boardSeq = #{boardSeq} AND memberSeq = ${memberSeq}
+    </update>
+
+    <update id="deleteReview" parameterType="Long">
+        UPDATE nogari_review.board
+        SET
+            deleteYN = 'Y',
+            modDt = NOW()
+        WHERE boardSeq = #{boardSeq}
+    </update>
+
+    <update id="addBoardViewCnt" parameterType="Long">
+        UPDATE nogari_review.board
+        SET
+            viewCnt = viewCnt + 1,
+            modDt = NOW()
+        WHERE boardSeq = #{boardSeq}
+    </update>
+
+    <select id="getBoardLikeCnt" parameterType="Long" resultType="com.msm.nogari.core.dto.board.review.ReviewBoardLikeDto">
+        SELECT
+            *
+        FROM nogari_review.board_like
+        WHERE boardSeq = #{boardSeq}
+    </select>
+
+    <insert id="setBoardLike" parameterType="com.msm.nogari.core.dto.board.review.ReviewBoardLikeDto">
+        INSERT INTO nogari_review.board_like
+        (
+            boardSeq, memberSeq,
+            regDt
+        )
+        VALUES
+            (
+                #{boardSeq}, #{memberSeq},
+                NOW()
+            )
+    </insert>
+
+    <delete id="deleteBoardLike" parameterType="com.msm.nogari.core.dto.board.review.ReviewBoardLikeDto">
+        DELETE FROM nogari_review.board_like
+        WHERE memberSeq = ${memberSeq}
+    </delete>
+
+    <insert id="setComment" parameterType="com.msm.nogari.core.dto.board.review.ReviewCommentDto" useGeneratedKeys="true" keyColumn="commentSeq">
+        INSERT INTO nogari_review.comment
+        (
+        boardSeq, memberSeq, nickname,
+        content,
+        regDt
+        )
+        VALUES
+        (
+        #{boardSeq}, #{memberSeq}, #{nickname},
+        #{content},
+        NOW()
+        )
+        <selectKey resultType="Long" keyProperty="commentSeq">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <select id="getComment" parameterType="Long" resultType="com.msm.nogari.core.dto.board.review.ReviewCommentDto">
+        SELECT
+            *
+        FROM nogari_review.comment
+        WHERE boardSeq = #{boardSeq} AND deleteYN = 'N'
+    </select>
+
+    <update id="deleteComment" parameterType="Long">
+        UPDATE nogari_review.comment
+        SET
+            deleteYN = 'Y',
+            modDt = NOW()
+        WHERE commentSeq = #{commentSeq}
+    </update>
+
+    <select id="getChildComment" parameterType="Long" resultType="com.msm.nogari.core.dto.board.community.ChildCommentDto">
+        SELECT
+            *
+        FROM nogari_review.child_comment
+        WHERE boardSeq = #{boardSeq} AND commentSeq = #{commentSeq} AND deleteYN = 'N'
+    </select>
+
+    <insert id="setChildComment" parameterType="com.msm.nogari.core.dto.board.community.ChildCommentDto" useGeneratedKeys="true" keyColumn="childCommentSeq">
+        INSERT INTO nogari_review.child_comment
+        (
+        boardSeq, commentSeq,
+        memberSeq, nickname,
+        content,
+        regDt
+        )
+        VALUES
+        (
+        #{boardSeq}, #{commentSeq},
+        #{memberSeq}, #{nickname},
+        #{content},
+        NOW()
+        )
+        <selectKey resultType="Long" keyProperty="childCommentSeq">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="deleteChildComment" parameterType="Long">
+        UPDATE nogari_review.child_comment
+        SET
+            deleteYN = 'Y',
+            modDt = NOW()
+        WHERE childCommentSeq = #{childCommentSeq}
+    </update>
+</mapper>

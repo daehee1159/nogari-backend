@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.msm.nogari.core.mapper.CommunityMapper">
+    <insert id="setCommunity" parameterType="com.msm.nogari.core.dto.board.community.BoardDto" useGeneratedKeys="true" keyColumn="boardSeq">
+        INSERT INTO nogari_community.board
+        (
+            title, content,
+            fileName1, fileName2, fileName3,
+            memberSeq, nickname,
+            regDt
+        )
+        VALUES
+        (
+            #{title}, #{content},
+            #{fileName1}, #{fileName2}, #{fileName3},
+            #{memberSeq}, #{nickname},
+            NOW()
+        )
+        <selectKey resultType="Long" keyProperty="boardSeq">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <select id="getAllCommunity" resultType="com.msm.nogari.core.dto.board.community.BoardDto">
+        SELECT
+            b.boardSeq,
+            b.title,
+            b.content,
+            b.fileName1,
+            b.fileName2,
+            b.fileName3,
+            b.memberSeq,
+            b.nickname,
+            b.viewCnt,
+            b.regDt,
+            b.hotYN,
+            b.noticeYN,
+            b.deleteYN,
+            COUNT(bl.boardSeq) AS likeCnt
+        FROM nogari_community.board b
+                 LEFT JOIN nogari_community.board_like bl ON b.boardSeq = bl.boardSeq
+        WHERE b.deleteYN = 'N'
+        GROUP BY b.boardSeq, b.title, b.content, b.regDt, b.deleteYN
+        ORDER BY b.regDt DESC
+    </select>
+
+    <select id="getLikeCommunity" resultType="com.msm.nogari.core.dto.board.community.BoardDto">
+        SELECT
+            *
+        FROM nogari_community.board WHERE deleteYN = 'N' AND likeCnt >= #{likeCount} ORDER BY regDt DESC
+    </select>
+
+    <select id="getNoticeCommunity" resultType="com.msm.nogari.core.dto.board.community.BoardDto">
+        SELECT
+            *
+        FROM nogari_community.board WHERE deleteYN = 'N' AND noticeYN = 'Y' ORDER BY regDt DESC
+    </select>
+
+    <select id="searchBoard" parameterType="map" resultType="com.msm.nogari.core.dto.board.community.BoardDto">
+        SELECT
+            *
+        FROM nogari_community.board
+        <where>
+            <if test="searchCondition == 'title'">
+                AND title LIKE CONCAT('%', #{keyword}, '%') AND deleteYN = 'N'
+            </if>
+            <if test="searchCondition == 'titleContent'">
+                AND (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%')) AND deleteYN = 'N'
+            </if>
+            <if test="searchCondition == 'content'">
+                AND content LIKE CONCAT('%', #{keyword}, '%') AND deleteYN = 'N'
+            </if>
+            <if test="searchCondition == 'nickname'">
+                AND memberSeq = #{keyword} AND deleteYN = 'N'
+            </if>
+        </where>
+    </select>
+
+    <select id="searchLikeBoard" parameterType="map" resultType="com.msm.nogari.core.dto.board.community.BoardDto">
+        SELECT
+        *
+        FROM nogari_community.board
+        <where>
+            <if test="searchCondition == 'title'">
+                AND title LIKE CONCAT('%', #{keyword}, '%') AND deleteYN = 'N'
+            </if>
+            <if test="searchCondition == 'titleContent'">
+                AND (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%')) AND deleteYN = 'N'
+            </if>
+            <if test="searchCondition == 'content'">
+                AND content LIKE CONCAT('%', #{keyword}, '%') AND deleteYN = 'N'
+            </if>
+            <if test="searchCondition == 'nickname'">
+                AND memberSeq = #{keyword} AND deleteYN = 'N' AND likeCnt >= #{likeCount}
+            </if>
+        </where>
+    </select>
+
+    <select id="searchNoticeBoard" parameterType="map" resultType="com.msm.nogari.core.dto.board.community.BoardDto">
+        SELECT
+        *
+        FROM nogari_community.board
+        <where>
+            <if test="searchCondition == 'title'">
+                AND title LIKE CONCAT('%', #{keyword}, '%') AND deleteYN = 'N'
+            </if>
+            <if test="searchCondition == 'titleContent'">
+                AND (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%')) AND deleteYN = 'N'
+            </if>
+            <if test="searchCondition == 'content'">
+                AND content LIKE CONCAT('%', #{keyword}, '%') AND deleteYN = 'N'
+            </if>
+            <if test="searchCondition == 'nickname'">
+                AND memberSeq = #{keyword} AND deleteYN = 'N' AND noticeYN = 'Y'
+            </if>
+        </where>
+    </select>
+
+    <select id="getCntOfComment" parameterType="Long" resultType="java.lang.Integer">
+        SELECT
+        COUNT(*)
+        FROM
+        nogari_community.comment
+        WHERE
+        boardSeq = #{boardSeq} AND deleteYN = 'N'
+    </select>
+
+    <select id="getCommunityByIdx" parameterType="Long" resultType="com.msm.nogari.core.dto.board.community.BoardDto">
+        SELECT
+            *
+        FROM nogari_community.board
+        WHERE boardSeq = #{boardSeq} AND deleteYN = 'N' ORDER BY startDt DESC
+    </select>
+
+    <select id="getCommunity" parameterType="Long" resultType="com.msm.nogari.core.dto.board.community.BoardDto">
+        SELECT
+            *
+        FROM nogari_community.board
+        WHERE memberSeq = #{memberSeq} AND deleteYN = 'N'
+    </select>
+
+    <update id="updateCommunity" parameterType="com.msm.nogari.core.dto.board.community.BoardDto">
+        UPDATE nogari_community.board
+        SET
+            title = #{title},
+            content = #{content},
+            <choose>
+                <when test="fileName1 != null">fileName1 = #{fileName1},</when>
+                <otherwise>fileName1 = null,</otherwise>
+            </choose>
+            <choose>
+                <when test="fileName2 != null">fileName2 = #{fileName2},</when>
+                <otherwise>fileName2 = null,</otherwise>
+            </choose>
+            <choose>
+                <when test="fileName3 != null">fileName3 = #{fileName3},</when>
+                <otherwise>fileName3 = null,</otherwise>
+            </choose>
+            modDt = NOW()
+        WHERE boardSeq = #{boardSeq} AND memberSeq = ${memberSeq}
+    </update>
+
+    <update id="deleteCommunity" parameterType="Long">
+        UPDATE nogari_community.board
+        SET
+            deleteYN = 'Y',
+            modDt = NOW()
+        WHERE boardSeq = #{boardSeq}
+    </update>
+
+    <update id="addBoardViewCnt" parameterType="Long">
+        UPDATE nogari_community.board
+        SET
+            viewCnt = viewCnt + 1,
+            modDt = NOW()
+        WHERE boardSeq = #{boardSeq}
+    </update>
+
+    <select id="getBoardLikeCnt" parameterType="Long" resultType="com.msm.nogari.core.dto.board.community.BoardLikeDto">
+        SELECT
+            *
+        FROM nogari_community.board_like
+        WHERE boardSeq = #{boardSeq}
+    </select>
+
+    <insert id="setBoardLike" parameterType="com.msm.nogari.core.dto.board.community.BoardLikeDto">
+        INSERT INTO nogari_community.board_like
+        (
+        boardSeq, memberSeq,
+        regDt
+        )
+        VALUES
+        (
+        #{boardSeq}, #{memberSeq},
+        NOW()
+        )
+    </insert>
+
+    <delete id="deleteBoardLike" parameterType="com.msm.nogari.core.dto.board.community.BoardLikeDto">
+        DELETE FROM nogari_community.board_like
+        WHERE memberSeq = ${memberSeq}
+    </delete>
+
+    <insert id="setComment" parameterType="com.msm.nogari.core.dto.board.community.CommentDto" useGeneratedKeys="true" keyColumn="commentSeq">
+        INSERT INTO nogari_community.comment
+            (
+                boardSeq, memberSeq, nickname,
+                content,
+                regDt
+            )
+        VALUES
+            (
+                #{boardSeq}, #{memberSeq}, #{nickname},
+                #{content},
+                NOW()
+            )
+        <selectKey resultType="Long" keyProperty="commentSeq">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <select id="getComment" parameterType="Long" resultType="com.msm.nogari.core.dto.board.community.CommentDto">
+        SELECT
+            *
+        FROM nogari_community.comment
+        WHERE boardSeq = #{boardSeq} AND deleteYN = 'N'
+    </select>
+
+    <update id="deleteComment" parameterType="Long">
+        UPDATE nogari_community.comment
+        SET
+            deleteYN = 'Y',
+            modDt = NOW()
+        WHERE commentSeq = #{commentSeq}
+    </update>
+
+    <select id="getChildComment" parameterType="Long" resultType="com.msm.nogari.core.dto.board.community.ChildCommentDto">
+        SELECT
+            *
+        FROM nogari_community.child_comment
+        WHERE boardSeq = #{boardSeq} AND commentSeq = #{commentSeq} AND deleteYN = 'N'
+    </select>
+
+    <insert id="setChildComment" parameterType="com.msm.nogari.core.dto.board.community.ChildCommentDto" useGeneratedKeys="true" keyColumn="childCommentSeq">
+        INSERT INTO nogari_community.child_comment
+        (
+        boardSeq, commentSeq,
+        memberSeq, nickname,
+        content,
+        regDt
+        )
+        VALUES
+        (
+        #{boardSeq}, #{commentSeq},
+        #{memberSeq}, #{nickname},
+        #{content},
+        NOW()
+        )
+        <selectKey resultType="Long" keyProperty="childCommentSeq">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="deleteChildComment" parameterType="Long">
+        UPDATE nogari_community.child_comment
+        SET
+            deleteYN = 'Y',
+            modDt = NOW()
+        WHERE childCommentSeq = #{childCommentSeq}
+    </update>
+
+</mapper>

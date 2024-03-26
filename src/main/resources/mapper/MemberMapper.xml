@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.msm.nogari.core.mapper.MemberMapper">
+
+    <insert id="memberRegistration" parameterType="com.msm.nogari.core.dao.MemberDao" useGeneratedKeys="true" keyColumn="memberSeq">
+        INSERT INTO nogari_member.member
+        (
+        username, email, nickName, password,
+        device, identifier, deviceToken,
+        status,userRole,
+        modDt,regDt,ipAddr
+        )
+        VALUES
+        (
+        #{username}, #{email}, #{nickName}, #{password},
+        #{device}, #{identifier}, #{deviceToken},
+        #{status}, #{userRole},
+        #{modDt}, NOW(), #{ipAddr}
+        )
+        <selectKey resultType="Long" keyProperty="memberSeq">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <select id="getMemberInfoByUsername" parameterType="String" resultType="com.msm.nogari.core.dao.MemberDao">
+        SELECT
+            *
+        FROM nogari_member.member
+        WHERE username = #{username}
+    </select>
+
+    <select id="getIosMemberStatus" parameterType="String" resultType="com.msm.nogari.core.dao.MemberDao">
+        SELECT
+            *
+        FROM nogari_member.member
+        WHERE email = #{email} OR identifier = #{identifier}
+    </select>
+
+    <select id="isDuplicateEmail" parameterType="String" resultType="com.msm.nogari.core.dao.MemberDao">
+        SELECT
+            *
+        FROM nogari_member.member
+        WHERE email = #{email}
+    </select>
+
+    <select id="isDuplicateNickName" parameterType="String" resultType="com.msm.nogari.core.dao.MemberDao">
+        SELECT
+            *
+        FROM nogari_member.member
+        WHERE nickName = #{nickName}
+    </select>
+
+    <select id="getDeviceToken" parameterType="Long" resultType="String">
+        SELECT
+            deviceToken
+        FROM nogari_member.member
+        WHERE memberSeq = #{memberSeq}
+    </select>
+
+    <update id="updateDeviceToken" parameterType="com.msm.nogari.core.dto.member.MemberDto">
+        UPDATE nogari_member.member
+        SET
+            device = #{device},
+            deviceToken = #{deviceToken},
+            modDt = NOW()
+        WHERE email = #{email}
+    </update>
+
+    <select id="getMemberInfo" parameterType="Long" resultType="com.msm.nogari.core.dao.MemberDao">
+        SELECT
+            *
+        FROM nogari_member.member
+        WHERE memberSeq = #{memberSeq}
+    </select>
+
+    <update id="updateNickName" parameterType="String">
+        UPDATE nogari_member.member
+        SET
+            nickName = #{nickName},
+            modDt = NOW()
+        WHERE memberSeq = #{memberSeq}
+    </update>
+
+    <insert id="withdrawalMember" parameterType="com.msm.nogari.core.dto.member.WithdrawalMemberDto">
+        INSERT INTO nogari_member.withdrawal
+            (memberSeq, reasonMessage, regDt)
+        VALUES
+            (#{memberSeq}, #{reasonMessage}, NOW())
+    </insert>
+
+    <insert id="blockMember" parameterType="com.msm.nogari.core.dto.member.BlockDto" useGeneratedKeys="true" keyColumn="blockSeq">
+        INSERT INTO nogari_member.block
+            (memberSeq, blockMemberSeq, regDt)
+        VALUES
+            (#{memberSeq}, #{blockMemberSeq}, NOW())
+        <selectKey resultType="Long" keyProperty="blockSeq">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <resultMap id="blockDtoResultMap" type="com.msm.nogari.core.dto.member.BlockDto">
+        <id property="blockSeq" column="blockSeq"/>
+        <result property="memberSeq" column="memberSeq"/>
+        <result property="blockMemberSeq" column="blockMemberSeq"/>
+        <result property="regDt" column="regDt"/>
+        <!-- blockMemberNickname을 nogari_member.member 테이블의 nickname 컬럼과 매칭 -->
+        <result property="blockMemberNickname" column="nickname"/>
+    </resultMap>
+
+    <!-- SELECT 쿼리 정의 -->
+    <select id="getBlockMember" resultMap="blockDtoResultMap">
+        SELECT
+        b.blockSeq,
+        b.memberSeq,
+        b.blockMemberSeq,
+        m.nickname,
+        b.regDt
+        FROM
+        nogari_member.block b
+        JOIN
+        nogari_member.member m ON b.blockMemberSeq = m.memberSeq
+        WHERE
+        b.memberSeq = #{memberSeq}
+    </select>
+
+    <delete id="deleteBlockMember" parameterType="java.util.List">
+        DELETE FROM nogari_member.block
+        WHERE memberSeq = #{blockDtoList[0].memberSeq} AND blockMemberSeq IN
+        <foreach collection="blockDtoList" item="item" index="index" separator="," open="(" close=")">
+            #{item.blockMemberSeq}
+        </foreach>
+    </delete>
+
+    <update id="updateStatus">
+        UPDATE nogari_member.member
+        SET
+            status = #{status},
+            modDt = NOW()
+        WHERE memberSeq = #{memberSeq}
+    </update>
+
+    <insert id="setPointHistory" parameterType="com.msm.nogari.core.dto.member.PointHistoryDto">
+        INSERT INTO nogari_member.point_history
+            (memberSeq, point, pointHistory, historyComment, resultComment, regDt)
+        VALUES
+            (#{memberSeq}, #{point}, #{pointHistory}, #{historyComment}, #{resultComment}, NOW())
+    </insert>
+
+    <select id="getPointHistory" parameterType="Long" resultType="com.msm.nogari.core.dto.member.PointHistoryDto">
+        SELECT
+            *
+        FROM nogari_member.point_history
+        WHERE memberSeq = #{memberSeq}
+    </select>
+
+    <select id="getPointHistoryToday" parameterType="Long" resultType="com.msm.nogari.core.dto.member.PointHistoryDto">
+        SELECT
+            *
+        FROM nogari_member.point_history
+        WHERE memberSeq = #{memberSeq} AND DATE_FORMAT(regDt, '%Y-%m-%d') = DATE_FORMAT(CURRENT_DATE(), '%Y-%m-%d')
+    </select>
+
+    <select id="getNotification" parameterType="Long" resultType="com.msm.nogari.core.dto.member.NotificationDto">
+        SELECT
+            *
+        FROM nogari_member.notification
+        WHERE memberSeq = #{memberSeq} ORDER BY regDt DESC
+    </select>
+
+    <insert id="setNotification" parameterType="com.msm.nogari.core.dto.member.NotificationDto">
+        INSERT INTO nogari_member.notification
+            (memberSeq, type, message, boardSeq, regDt)
+        VALUES
+            (#{memberSeq}, #{type}, #{message}, #{boardSeq}, NOW())
+    </insert>
+
+    <select id="getLevelAndPoint" parameterType="Long" resultType="com.msm.nogari.core.dto.member.LevelDto">
+        SELECT
+            *
+        FROM nogari_member.level
+        WHERE memberSeq = #{memberSeq}
+    </select>
+
+    <insert id="setLevelAndPoint" parameterType="com.msm.nogari.core.dto.member.LevelDto">
+        INSERT INTO nogari_member.level
+            (memberSeq, level, point, regDt)
+        VALUES
+            (#{memberSeq}, #{level}, #{point}, NOW())
+    </insert>
+
+    <update id="updateLevelAndPoint" parameterType="com.msm.nogari.core.dto.member.LevelDto">
+        UPDATE nogari_member.level
+        SET
+            level = #{level},
+            point = #{point},
+            modDt = NOW()
+        WHERE levelSeq = ${levelSeq} AND memberSeq = #{memberSeq}
+    </update>
+</mapper>

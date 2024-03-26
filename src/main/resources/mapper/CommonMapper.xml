@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.msm.nogari.core.mapper.CommonMapper">
+    <select id="getAppVersion" resultType="com.msm.nogari.core.dto.common.AppVersionDto">
+        SELECT *
+        FROM nogari_member.app_version
+        ORDER BY regDt DESC LIMIT 1
+    </select>
+
+    <select id="getAllHolidays" resultType="com.msm.nogari.core.dto.man_hour.ManHourDto">
+        SELECT
+            *
+        FROM nogari_man_hour.man_hour
+        WHERE isHoliday = 'Y' ORDER BY startDt DESC
+    </select>
+
+    <insert id="setHoliday" parameterType="com.msm.nogari.core.dto.man_hour.ManHourDto">
+        INSERT INTO nogari_man_hour.man_hour
+        (
+            memberSeq,
+            startDt, endDt,
+            totalAmount, manHour, unitPrice, memo, isHoliday,
+            regDt
+        )
+        VALUES
+        (
+            #{memberSeq},
+            #{startDt}, #{endDt},
+            #{totalAmount}, #{manHour}, #{unitPrice}, #{memo}, #{isHoliday},
+            NOW()
+        )
+    </insert>
+
+    <insert id="setNews" parameterType="java.util.List">
+        INSERT INTO nogari_news.news (title, originallink, link, description, pubDate, imgUrl, regDt)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.title}, #{item.originallink}, #{item.link}, #{item.description}, #{item.pubDate}, #{item.imgUrl}, NOW())
+        </foreach>
+    </insert>
+
+    <select id="getNews" resultType="com.msm.nogari.core.dto.common.NewsResponse$NewsItem">
+        SELECT
+            *
+        FROM nogari_news.news WHERE regDt >= DATE_SUB(NOW(), interval 3 day) ORDER BY regDt DESC;
+    </select>
+
+    <select id="getTaxInfo" resultMap="taxInfoResultMap" parameterType="java.util.Map">
+    <![CDATA[
+        SELECT
+            it.more,
+            it.under,
+            it.amount,
+            np.nationalPension,
+            hi.healthInsurance,
+            ei.employmentInsurance
+        FROM
+            nogari_tax.incometax it
+                JOIN
+            nogari_tax.national_pension np ON it.standardDt = np.standardDt
+                JOIN
+            nogari_tax.health_insurance hi ON it.standardDt = hi.standardDt
+                JOIN
+            nogari_tax.employment_insurance ei ON it.standardDt = ei.standardDt
+        WHERE
+            it.standardDt = #{standardDt}
+        ]]>
+    </select>
+
+    <resultMap id="taxInfoResultMap" type="com.msm.nogari.core.dto.common.TaxInfoDto">
+        <result property="nationalPension" column="nationalPension"/>
+        <result property="healthInsurance" column="healthInsurance"/>
+        <result property="employmentInsurance" column="employmentInsurance"/>
+
+        <!-- Omit the constructor as it's not needed -->
+
+        <!-- Use association to map the List of IncomeTaxDto -->
+        <association property="incomeTaxDtoList" resultMap="incomeTaxDtoResultMap" />
+    </resultMap>
+
+    <resultMap id="incomeTaxDtoResultMap" type="com.msm.nogari.core.dto.common.TaxInfoDto$IncomeTaxDto">
+        <result property="more" column="more"/>
+        <result property="under" column="under"/>
+        <result property="amount" column="amount"/>
+        <result property="standardDt" column="standardDt"/>
+    </resultMap>
+
+    <insert id="reportBoard" parameterType="com.msm.nogari.core.dto.common.ReportDto">
+        INSERT INTO nogari_common.report
+        (
+            reportSeq,
+            boardType, reportReason,
+            reporterMemberSeq, reportedMemberSeq,
+            regDt
+        )
+        VALUES
+        (
+            #{reportSeq},
+            #{boardType}, #{reportReason},
+            #{reporterMemberSeq}, #{reportedMemberSeq},
+            NOW()
+        )
+    </insert>
+</mapper>

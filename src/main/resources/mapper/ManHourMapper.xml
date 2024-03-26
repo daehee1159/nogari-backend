@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.msm.nogari.core.mapper.ManHourMapper">
+    <insert id="setManHour" parameterType="com.msm.nogari.core.dto.man_hour.ManHourDto">
+        INSERT INTO nogari_man_hour.man_hour
+            (
+             memberSeq,
+             startDt, endDt,
+             totalAmount, manHour, unitPrice, etcPrice, memo,isHoliday,
+             regDt
+            )
+        VALUES
+            (
+             #{memberSeq},
+             #{startDt}, #{endDt},
+             #{totalAmount}, #{manHour}, #{unitPrice}, #{etcPrice}, #{memo}, #{isHoliday},
+             NOW()
+            )
+    </insert>
+
+    <select id="getManHourList" parameterType="Long" resultType="com.msm.nogari.core.dto.man_hour.ManHourDto">
+        SELECT
+            *
+        FROM nogari_man_hour.man_hour
+        WHERE memberSeq = #{memberSeq} OR isHoliday = 'Y' ORDER BY startDt DESC
+    </select>
+
+    <select id="getManHour" parameterType="Long" resultType="com.msm.nogari.core.dto.man_hour.ManHourDto">
+        SELECT
+            *
+        FROM nogari_man_hour.man_hour
+        WHERE manHourSeq = #{manHourSeq}
+    </select>
+
+    <update id="updateManHour" parameterType="com.msm.nogari.core.dto.man_hour.ManHourDto">
+        UPDATE nogari_man_hour.man_hour
+        SET
+            manHour = #{manHour},
+            unitPrice = #{unitPrice},
+            etcPrice = #{etcPrice},
+            memo = #{memo},
+            modDt = NOW()
+        WHERE manHourSeq = #{manHourSeq}
+    </update>
+
+    <delete id="deleteManHour" parameterType="java.util.ArrayList">
+        DELETE FROM nogari_man_hour.man_hour
+        WHERE manHourSeq IN
+        <foreach collection="manHourSeqList" item="item" index="index" separator="," open="(" close=")">
+            #{item.value}
+        </foreach>
+    </delete>
+
+    <select id="getManHourHistory" parameterType="Long" resultType="com.msm.nogari.core.dto.man_hour.ManHourDto">
+        <![CDATA[
+        SELECT
+            *
+        FROM nogari_man_hour.man_hour
+        WHERE manHourSeq = #{manHourSeq} AND startDt >= #{startDt} AND endDt <= #{endDt}
+        ]]>
+    </select>
+
+</mapper>

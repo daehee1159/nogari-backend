@@ -1,0 +1,60 @@
+server:
+    port: 80
+    servlet:
+        encoding:
+            charset: UTF-8
+            enabled: true
+            force: true
+
+mybatis:
+    mapper-locations: classpathLmapper/**.xml
+    configuration:
+        map-underscore-to-camel-case: true
+
+spring:
+    servlet:
+        multipart:
+            max-file-size: 20MB
+    datasource:
+        hikari:
+            driver-class-name: com.mysql.cj.jdbc.Driver
+            jdbc-url: ${DATABASE_URL}
+            username: ${DATABASE_USERNAME}
+            password: ${DATABASE_PASSWORD}
+            connection-test-query: SELECT NOW() FROM dual
+            max-lifetime: 580000
+    mvc:
+        converters:
+            preferred-json-mapper: gson
+jwt:
+    access:
+        token:
+            secure:
+                key: access_key_1234
+            expire:
+                time: 10000
+    refresh:
+        token:
+            secure:
+                key: refresh_key_1234
+            expire:
+                time: 10000
+    get:
+        access:
+            token:
+                url: /get_access_token
+app:
+    upload:
+        dir: ${UPLOAD_URL}
+uploadFile:
+    resourcePath: /upload/
+
+pagehelper:
+    auto-dialect: true
+    page-size-zero: false
+    reasonable: true
+    offset-as-page-num: false
+    row-bounds-with-count: false
+    auto-runtime-dialect: false
+    close-conn: true
+    default-count: true
