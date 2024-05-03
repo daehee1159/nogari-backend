@@ -79,11 +79,6 @@ public class CommonServiceImpl implements CommonService {
 
 						manHourDtoList.add(manHourDto);
 					}
-					System.out.println("결과물");
-					for (int i = 0; i < manHourDtoList.size(); i++) {
-						System.out.println(manHourDtoList.get(i).getMemo());
-						System.out.println(manHourDtoList.get(i).getStartDt());
-					}
 
 					List<ManHourDto> allHolidayList = commonMapper.getAllHolidays();
 
@@ -95,12 +90,6 @@ public class CommonServiceImpl implements CommonService {
 									allHoliday.getStartDt().toString().equals(manHourDto.getStartDt().toString())
 										&& allHoliday.getMemo().equals(manHourDto.getMemo()))
 						);
-						System.out.println("필터링 결과물");
-						for (int i = 0; i < manHourDtoList.size(); i++) {
-							System.out.println(manHourDtoList.get(i).getMemo());
-							System.out.println(manHourDtoList.get(i).getStartDt());
-						}
-
 					}
 					return setHolidayList(manHourDtoList);
 				} else {
@@ -139,8 +128,8 @@ public class CommonServiceImpl implements CommonService {
 
 	@Override
 	public boolean setNews(String keyword) throws JsonProcessingException {
-		String clientId = "E6nNqH7Vy21SVctdqqWf";
-		String clientSecret = "5NbbnzBHFG";
+		String clientId = "clientId";
+		String clientSecret = "clientSecret";
 
 		String text;
 
@@ -162,21 +151,14 @@ public class CommonServiceImpl implements CommonService {
 		requestHeaders.put("X-Naver-Client-Secret", clientSecret);
 		String responseBody = get(apiURL, requestHeaders);
 
-		System.out.println(responseBody);
-
 		ObjectMapper objectMapper = new ObjectMapper();
 		NewsResponse newsResponse = objectMapper.readValue(responseBody, NewsResponse.class);
 
-		System.out.println(newsResponse);
-
 		for (int i = 0; i < newsResponse.getItems().size(); i++) {
-			System.out.println(newsResponse.getItems().get(i).getLink());
 			String ogImage = extractOGImage(newsResponse.getItems().get(i).getLink());
 			if (ogImage != null) {
-				System.out.println("og:image " + ogImage);
 				newsResponse.getItems().get(i).setImgUrl(ogImage);
 			} else {
-				System.out.println("og:image not found");
 				newsResponse.getItems().get(i).setImgUrl("");
 			}
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
@@ -199,7 +181,7 @@ public class CommonServiceImpl implements CommonService {
 			// MySQL 연결 설정
 			String url = "jdbc:mysql://localhost:3306/nogari_tax";
 			String user = "root";
-			String password = "eogml1159@";
+			String password = "root";
 			Connection connection = DriverManager.getConnection(url, user, password);
 
 			// 엑셀 파일 읽기
