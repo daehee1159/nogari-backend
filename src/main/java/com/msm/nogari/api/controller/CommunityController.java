@@ -35,13 +35,6 @@ public class CommunityController {
 		return communityService.setCommunity(boardDto);
 	}
 
-	/**
-	 * 전체 게시글 조회
-	 */
-//	@RequestMapping(value = "/d", method = RequestMethod.GET)
-//	public List<BoardDto> getAllCommunity() {
-//		return communityService.getAllCommunity();
-//	}
 
 	/**
 	 * 페이징 처리 후 전체 게시글 조회

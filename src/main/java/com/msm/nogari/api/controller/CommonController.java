@@ -42,7 +42,7 @@ public class CommonController {
 	 */
 	@RequestMapping(value = "/holiday", method = RequestMethod.GET)
 	public boolean getHolidayData(@RequestParam(value = "solYear") int year) throws Exception {
-		String serviceKey = "9uXmzTHFarDrCIyJyaijV1W1SfpAq2%2BopMfTjXB5P5f3bkp1Bj9RG3hmkk%2FZGAR0YdxVunCYqImifqnp1t1QfA%3D%3D";
+		String serviceKey = "serviceKey";
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
 		String apiUrl = "http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo";
@@ -51,13 +51,7 @@ public class CommonController {
 			.queryParam("numOfRows", 100);
 		String responseData = restTemplate.getForObject(uriComponentsBuilder.toUriString(), String.class);
 
-		System.out.println("데이터 확인");
-		System.out.println(responseData);
-
 		String jsonData = convertXmlToJson(responseData);
-
-		System.out.println("파싱 결과");
-		System.out.println(jsonData);
 
 		return commonService.setHoliday(jsonData);
 	}

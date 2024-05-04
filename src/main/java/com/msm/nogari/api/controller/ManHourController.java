@@ -42,7 +42,7 @@ public class ManHourController {
 	/**
 	 * 공수 캘린더 수정하기
 	 */
-	@RequestMapping(value = "/update", method = RequestMethod.POST)
+	@RequestMapping(value = "", method = RequestMethod.PATCH)
 	public boolean updateManHour(@RequestBody ManHourDto manHourDto) {
 		return manHourService.updateManHour(manHourDto);
 	}
@@ -51,7 +51,7 @@ public class ManHourController {
 	 * 공수 캘린더 삭제하기
 	 * 일별 삭제, 월별 삭제 기능 때문에 parameter를 List로 받음
 	 */
-	@RequestMapping(value = "/delete", method = RequestMethod.POST)
+	@RequestMapping(value = "", method = RequestMethod.DELETE)
 	public boolean deleteManHour(@RequestBody List<ManHourDto> manHourDtoList) {
 		return manHourService.deleteManHour(manHourDtoList);
 	}
