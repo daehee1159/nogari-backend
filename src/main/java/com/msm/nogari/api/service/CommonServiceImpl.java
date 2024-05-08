@@ -3,6 +3,7 @@ package com.msm.nogari.api.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.msm.nogari.NogariApplication;
 import com.msm.nogari.core.dto.common.AppVersionDto;
 import com.msm.nogari.core.dto.common.NewsResponse;
@@ -17,9 +18,13 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -47,6 +52,9 @@ public class CommonServiceImpl implements CommonService {
 	private final CommonMapper commonMapper;
 	private final ObjectMapper objectMapper;
 
+	@Value("${api.holiday.service-key}")
+	private String serviceKey;
+
 	@Override
 	public AppVersionDto getAppVersion() {
 		return commonMapper.getAppVersion();
@@ -54,8 +62,19 @@ public class CommonServiceImpl implements CommonService {
 
 	@Override
 	@Transactional
-	public boolean setHoliday(String jsonData) throws Exception {
+	public boolean setHoliday(int year) throws Exception {
 		try {
+			String serviceKey = this.serviceKey;
+			RestTemplate restTemplate = new RestTemplate();
+			restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+			String apiUrl = "http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo";
+			UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(apiUrl)
+				.queryParam("serviceKey", serviceKey).queryParam("solYear", year)
+				.queryParam("numOfRows", 100);
+			String responseData = restTemplate.getForObject(uriComponentsBuilder.toUriString(), String.class);
+
+			String jsonData = convertXmlToJson(responseData);
+
 			// JSON 문자열을 JsonNode 로 변환
 			JsonNode jsonNode = objectMapper.readTree(jsonData);
 			// 필요한 부분만 추출하여 DTO 매핑
@@ -87,7 +106,7 @@ public class CommonServiceImpl implements CommonService {
 						manHourDtoList.removeIf(manHourDto ->
 							allHolidayList.stream()
 								.anyMatch(allHoliday ->
-									allHoliday.getStartDt().toString().equals(manHourDto.getStartDt().toString())
+									allHoliday.getStartDt().equals(manHourDto.getStartDt())
 										&& allHoliday.getMemo().equals(manHourDto.getMemo()))
 						);
 					}
@@ -297,6 +316,25 @@ public class CommonServiceImpl implements CommonService {
 			return responseBody.toString();
 		} catch (IOException e) {
 			throw new RuntimeException("API 응답을 읽는 데 실패했습니다.", e);
+		}
+	}
+
+	private String convertXmlToJson(String xmlData) {
+		try {
+			// XmlMapper를 사용하여 XML을 JSON으로 변환
+			XmlMapper xmlMapper = new XmlMapper();
+
+			// UTF-8로 인코딩된 바이트 배열로 변환하여 XmlMapper에 전달
+			byte[] xmlBytes = xmlData.getBytes(StandardCharsets.UTF_8);
+			JsonNode jsonNode = xmlMapper.readTree(xmlBytes);
+
+			// JSON 문자열로 변환
+			String jsonData = jsonNode.toString();
+			return jsonData;
+		} catch (Exception e) {
+			// 예외 처리
+			e.printStackTrace();
+			return null;
 		}
 	}
 }

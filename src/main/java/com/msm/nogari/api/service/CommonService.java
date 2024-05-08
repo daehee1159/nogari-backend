@@ -15,7 +15,7 @@ import java.util.List;
 public interface CommonService {
 
 	AppVersionDto getAppVersion();
-	boolean setHoliday(String jsonData) throws Exception;
+	boolean setHoliday(int year) throws Exception;
 	String extractOGImage(String newsUrl);
 
 	boolean setNews(String keyword) throws JsonProcessingException;

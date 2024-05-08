@@ -42,18 +42,7 @@ public class CommonController {
 	 */
 	@RequestMapping(value = "/holiday", method = RequestMethod.GET)
 	public boolean getHolidayData(@RequestParam(value = "solYear") int year) throws Exception {
-		String serviceKey = "serviceKey";
-		RestTemplate restTemplate = new RestTemplate();
-		restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
-		String apiUrl = "http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo";
-		UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(apiUrl)
-			.queryParam("serviceKey", serviceKey).queryParam("solYear", year)
-			.queryParam("numOfRows", 100);
-		String responseData = restTemplate.getForObject(uriComponentsBuilder.toUriString(), String.class);
-
-		String jsonData = convertXmlToJson(responseData);
-
-		return commonService.setHoliday(jsonData);
+		return commonService.setHoliday(year);
 	}
 
 	@RequestMapping(value = "/news", method = RequestMethod.GET)
@@ -83,24 +72,5 @@ public class CommonController {
 	@RequestMapping(value = "/report", method = RequestMethod.POST)
 	public boolean reportBoard(@RequestBody ReportDto reportDto) {
 		return commonService.reportBoard(reportDto);
-	}
-
-	private String convertXmlToJson(String xmlData) {
-		try {
-			// XmlMapper를 사용하여 XML을 JSON으로 변환
-			XmlMapper xmlMapper = new XmlMapper();
-
-			// UTF-8로 인코딩된 바이트 배열로 변환하여 XmlMapper에 전달
-			byte[] xmlBytes = xmlData.getBytes(StandardCharsets.UTF_8);
-			JsonNode jsonNode = xmlMapper.readTree(xmlBytes);
-
-			// JSON 문자열로 변환
-			String jsonData = jsonNode.toString();
-			return jsonData;
-		} catch (Exception e) {
-			// 예외 처리
-			e.printStackTrace();
-			return null;
-		}
 	}
 }
