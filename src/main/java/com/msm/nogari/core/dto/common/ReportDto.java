@@ -1,5 +1,6 @@
 package com.msm.nogari.core.dto.common;
 
+import com.msm.nogari.core.dao.common.ReportDao;
 import com.msm.nogari.core.enums.ReportReason;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +14,7 @@ import lombok.Setter;
 public class ReportDto {
 	private Long reportSeq;
 
-	private BoardType boardType;
+	private ReportDao.BoardType boardType;
 	private Long boardSeq;
 	private ReportReason reportReason;
 
@@ -22,12 +23,4 @@ public class ReportDto {
 
 	private String regDt;
 
-	public static enum BoardType {
-		COMMUNITY,
-		REVIEW,
-		COMMUNITY_COMMENT,
-		REVIEW_COMMENT,
-		COMMUNITY_CHILD_COMMENT,
-		REVIEW_CHILD_COMMENT
-	}
 }

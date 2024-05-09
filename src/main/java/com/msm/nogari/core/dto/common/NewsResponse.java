@@ -28,9 +28,8 @@ public class NewsResponse {
 	@JsonProperty("items")
 	private List<NewsItem> items;
 
-	// Getter and Setter methods
 
-	// Inner class representing the NewsItem
+	// Inner class NewsItem
 	@Getter
 	@Setter
 	public static class NewsItem {
@@ -52,7 +51,5 @@ public class NewsResponse {
 		private String imgUrl;
 
 		private String regDt;
-
-		// Getter and Setter methods
 	}
 }

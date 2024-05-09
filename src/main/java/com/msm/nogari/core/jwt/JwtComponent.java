@@ -1,6 +1,6 @@
 package com.msm.nogari.core.jwt;
 
-import com.msm.nogari.core.dao.MemberDao;
+import com.msm.nogari.core.dao.member.MemberDao;
 import com.msm.nogari.core.jwt.enums.CommonException;
 import com.msm.nogari.core.jwt.enums.EnumSecurityException;
 import com.msm.nogari.core.jwt.service.JwtService;

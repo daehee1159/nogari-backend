@@ -1,4 +1,4 @@
-package com.msm.nogari.core.dao;
+package com.msm.nogari.core.dao.member;
 
 import com.msm.nogari.core.dto.member.MemberDto;
 import com.msm.nogari.core.enums.MemberStatus;
@@ -45,6 +45,7 @@ public class MemberDao implements UserDetails {
 	private final boolean isAccountNonExpired = true;
 	private final boolean isAccountNonLocked = true;
 
+	// static factory method를 사용하여 객체를 캡슐화
 	public static MemberDao of(MemberDto memberDto, String encodedPassword) {
 		// 유효성 검증
 		validate(memberDto, encodedPassword);

@@ -3,7 +3,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.msm.nogari.core.mapper.MemberMapper">
 
-    <insert id="memberRegistration" parameterType="com.msm.nogari.core.dao.MemberDao" useGeneratedKeys="true" keyColumn="memberSeq">
+    <insert id="memberRegistration" parameterType="com.msm.nogari.core.dao.member.MemberDao" useGeneratedKeys="true" keyColumn="memberSeq">
         INSERT INTO nogari_member.member
         (
         username, email, nickName, password,
@@ -23,28 +23,28 @@
         </selectKey>
     </insert>
 
-    <select id="getMemberInfoByUsername" parameterType="String" resultType="com.msm.nogari.core.dao.MemberDao">
+    <select id="getMemberInfoByUsername" parameterType="String" resultType="com.msm.nogari.core.dao.member.MemberDao">
         SELECT
             *
         FROM nogari_member.member
         WHERE username = #{username}
     </select>
 
-    <select id="getIosMemberStatus" parameterType="String" resultType="com.msm.nogari.core.dao.MemberDao">
+    <select id="getIosMemberStatus" parameterType="String" resultType="com.msm.nogari.core.dao.member.MemberDao">
         SELECT
             *
         FROM nogari_member.member
         WHERE email = #{email} OR identifier = #{identifier}
     </select>
 
-    <select id="isDuplicateEmail" parameterType="String" resultType="com.msm.nogari.core.dao.MemberDao">
+    <select id="isDuplicateEmail" parameterType="String" resultType="com.msm.nogari.core.dao.member.MemberDao">
         SELECT
             *
         FROM nogari_member.member
         WHERE email = #{email}
     </select>
 
-    <select id="isDuplicateNickName" parameterType="String" resultType="com.msm.nogari.core.dao.MemberDao">
+    <select id="isDuplicateNickName" parameterType="String" resultType="com.msm.nogari.core.dao.member.MemberDao">
         SELECT
             *
         FROM nogari_member.member
@@ -67,7 +67,7 @@
         WHERE email = #{email}
     </update>
 
-    <select id="getMemberInfo" parameterType="Long" resultType="com.msm.nogari.core.dao.MemberDao">
+    <select id="getMemberInfo" parameterType="Long" resultType="com.msm.nogari.core.dao.member.MemberDao">
         SELECT
             *
         FROM nogari_member.member

@@ -1,6 +1,6 @@
 package com.msm.nogari.core.mapper;
 
-import com.msm.nogari.core.dao.MemberDao;
+import com.msm.nogari.core.dao.member.MemberDao;
 import com.msm.nogari.core.dto.member.*;
 import com.msm.nogari.core.enums.MemberStatus;
 import org.apache.ibatis.annotations.Mapper;

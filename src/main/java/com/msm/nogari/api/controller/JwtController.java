@@ -1,7 +1,7 @@
 package com.msm.nogari.api.controller;
 
 import com.msm.nogari.api.service.MemberService;
-import com.msm.nogari.core.dao.MemberDao;
+import com.msm.nogari.core.dao.member.MemberDao;
 import com.msm.nogari.core.dto.jwt.AuthenticationMemberDto;
 import com.msm.nogari.core.dto.jwt.AuthenticationRequest;
 import com.msm.nogari.core.dto.jwt.AuthenticationResponse;

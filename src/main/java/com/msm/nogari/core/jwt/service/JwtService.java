@@ -1,6 +1,6 @@
 package com.msm.nogari.core.jwt.service;
 
-import com.msm.nogari.core.dao.MemberDao;
+import com.msm.nogari.core.dao.member.MemberDao;
 import com.msm.nogari.core.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
