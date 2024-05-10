@@ -61,7 +61,7 @@ public class ManHourController {
 	 * startDt, endDt 기간별로 조회하게 만듬
 	 */
 	@RequestMapping(value = "/history/{memberSeq}", method = RequestMethod.GET)
-	public List<ManHourHistoryDto> getManHourHistory(@PathVariable Long memberSeq, @RequestParam("startDt") String startDt, @RequestParam("endDt") String endDt) {
+	public List<ManHourDto> getManHourHistory(@PathVariable Long memberSeq, @RequestParam("startDt") String startDt, @RequestParam("endDt") String endDt) {
 		return manHourService.getManHourHistory(memberSeq, startDt, endDt);
 	}
 
