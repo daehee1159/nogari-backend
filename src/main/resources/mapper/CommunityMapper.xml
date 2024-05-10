@@ -22,7 +22,7 @@
         </selectKey>
     </insert>
 
-    <select id="getAllCommunity" resultType="com.msm.nogari.core.dto.board.community.BoardDto">
+    <select id="getAllCommunity" resultType="com.msm.nogari.core.dao.board.community.BoardDao">
         SELECT
             b.boardSeq,
             b.title,
@@ -45,19 +45,19 @@
         ORDER BY b.regDt DESC
     </select>
 
-    <select id="getLikeCommunity" resultType="com.msm.nogari.core.dto.board.community.BoardDto">
+    <select id="getLikeCommunity" resultType="com.msm.nogari.core.dao.board.community.BoardDao">
         SELECT
             *
         FROM nogari_community.board WHERE deleteYN = 'N' AND likeCnt >= #{likeCount} ORDER BY regDt DESC
     </select>
 
-    <select id="getNoticeCommunity" resultType="com.msm.nogari.core.dto.board.community.BoardDto">
+    <select id="getNoticeCommunity" resultType="com.msm.nogari.core.dao.board.community.BoardDao">
         SELECT
             *
         FROM nogari_community.board WHERE deleteYN = 'N' AND noticeYN = 'Y' ORDER BY regDt DESC
     </select>
 
-    <select id="searchBoard" parameterType="map" resultType="com.msm.nogari.core.dto.board.community.BoardDto">
+    <select id="searchBoard" parameterType="map" resultType="com.msm.nogari.core.dao.board.community.BoardDao">
         SELECT
             *
         FROM nogari_community.board
@@ -126,21 +126,21 @@
         boardSeq = #{boardSeq} AND deleteYN = 'N'
     </select>
 
-    <select id="getCommunityByIdx" parameterType="Long" resultType="com.msm.nogari.core.dto.board.community.BoardDto">
+    <select id="getCommunityByIdx" parameterType="Long" resultType="com.msm.nogari.core.dao.board.community.BoardDao">
         SELECT
             *
         FROM nogari_community.board
         WHERE boardSeq = #{boardSeq} AND deleteYN = 'N' ORDER BY startDt DESC
     </select>
 
-    <select id="getCommunity" parameterType="Long" resultType="com.msm.nogari.core.dto.board.community.BoardDto">
+    <select id="getCommunity" parameterType="Long" resultType="com.msm.nogari.core.dao.board.community.BoardDao">
         SELECT
             *
         FROM nogari_community.board
         WHERE memberSeq = #{memberSeq} AND deleteYN = 'N'
     </select>
 
-    <update id="updateCommunity" parameterType="com.msm.nogari.core.dto.board.community.BoardDto">
+    <update id="updateCommunity" parameterType="com.msm.nogari.core.dao.board.community.BoardDao">
         UPDATE nogari_community.board
         SET
             title = #{title},
@@ -177,14 +177,14 @@
         WHERE boardSeq = #{boardSeq}
     </update>
 
-    <select id="getBoardLikeCnt" parameterType="Long" resultType="com.msm.nogari.core.dto.board.community.BoardLikeDto">
+    <select id="getBoardLikeCnt" parameterType="Long" resultType="com.msm.nogari.core.dao.board.community.BoardLikeDao">
         SELECT
             *
         FROM nogari_community.board_like
         WHERE boardSeq = #{boardSeq}
     </select>
 
-    <insert id="setBoardLike" parameterType="com.msm.nogari.core.dto.board.community.BoardLikeDto">
+    <insert id="setBoardLike" parameterType="com.msm.nogari.core.dao.board.community.BoardLikeDao">
         INSERT INTO nogari_community.board_like
         (
         boardSeq, memberSeq,
@@ -197,12 +197,12 @@
         )
     </insert>
 
-    <delete id="deleteBoardLike" parameterType="com.msm.nogari.core.dto.board.community.BoardLikeDto">
+    <delete id="deleteBoardLike" parameterType="com.msm.nogari.core.dao.board.community.BoardLikeDao">
         DELETE FROM nogari_community.board_like
         WHERE memberSeq = ${memberSeq}
     </delete>
 
-    <insert id="setComment" parameterType="com.msm.nogari.core.dto.board.community.CommentDto" useGeneratedKeys="true" keyColumn="commentSeq">
+    <insert id="setComment" parameterType="com.msm.nogari.core.dao.board.community.CommentDao" useGeneratedKeys="true" keyColumn="commentSeq">
         INSERT INTO nogari_community.comment
             (
                 boardSeq, memberSeq, nickname,
@@ -220,7 +220,7 @@
         </selectKey>
     </insert>
 
-    <select id="getComment" parameterType="Long" resultType="com.msm.nogari.core.dto.board.community.CommentDto">
+    <select id="getComment" parameterType="Long" resultType="com.msm.nogari.core.dao.board.community.CommentDao">
         SELECT
             *
         FROM nogari_community.comment
@@ -235,14 +235,14 @@
         WHERE commentSeq = #{commentSeq}
     </update>
 
-    <select id="getChildComment" parameterType="Long" resultType="com.msm.nogari.core.dto.board.community.ChildCommentDto">
+    <select id="getChildComment" parameterType="Long" resultType="com.msm.nogari.core.dao.board.community.ChildCommentDao">
         SELECT
             *
         FROM nogari_community.child_comment
         WHERE boardSeq = #{boardSeq} AND commentSeq = #{commentSeq} AND deleteYN = 'N'
     </select>
 
-    <insert id="setChildComment" parameterType="com.msm.nogari.core.dto.board.community.ChildCommentDto" useGeneratedKeys="true" keyColumn="childCommentSeq">
+    <insert id="setChildComment" parameterType="com.msm.nogari.core.dao.board.community.ChildCommentDao" useGeneratedKeys="true" keyColumn="childCommentSeq">
         INSERT INTO nogari_community.child_comment
         (
         boardSeq, commentSeq,

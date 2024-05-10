@@ -58,7 +58,7 @@
         WHERE memberSeq = #{memberSeq}
     </select>
 
-    <update id="updateDeviceToken" parameterType="com.msm.nogari.core.dto.member.MemberDto">
+    <update id="updateDeviceToken" parameterType="com.msm.nogari.core.dao.member.MemberDao">
         UPDATE nogari_member.member
         SET
             device = #{device},
@@ -82,14 +82,14 @@
         WHERE memberSeq = #{memberSeq}
     </update>
 
-    <insert id="withdrawalMember" parameterType="com.msm.nogari.core.dto.member.WithdrawalMemberDto">
+    <insert id="withdrawalMember" parameterType="com.msm.nogari.core.dao.member.WithdrawalMemberDao">
         INSERT INTO nogari_member.withdrawal
             (memberSeq, reasonMessage, regDt)
         VALUES
             (#{memberSeq}, #{reasonMessage}, NOW())
     </insert>
 
-    <insert id="blockMember" parameterType="com.msm.nogari.core.dto.member.BlockDto" useGeneratedKeys="true" keyColumn="blockSeq">
+    <insert id="blockMember" parameterType="com.msm.nogari.core.dao.member.BlockDao" useGeneratedKeys="true" keyColumn="blockSeq">
         INSERT INTO nogari_member.block
             (memberSeq, blockMemberSeq, regDt)
         VALUES
@@ -99,7 +99,7 @@
         </selectKey>
     </insert>
 
-    <resultMap id="blockDtoResultMap" type="com.msm.nogari.core.dto.member.BlockDto">
+    <resultMap id="blockDtoResultMap" type="com.msm.nogari.core.dao.member.BlockDao">
         <id property="blockSeq" column="blockSeq"/>
         <result property="memberSeq" column="memberSeq"/>
         <result property="blockMemberSeq" column="blockMemberSeq"/>
@@ -140,56 +140,56 @@
         WHERE memberSeq = #{memberSeq}
     </update>
 
-    <insert id="setPointHistory" parameterType="com.msm.nogari.core.dto.member.PointHistoryDto">
+    <insert id="setPointHistory" parameterType="com.msm.nogari.core.dao.member.PointHistoryDao">
         INSERT INTO nogari_member.point_history
             (memberSeq, point, pointHistory, historyComment, resultComment, regDt)
         VALUES
             (#{memberSeq}, #{point}, #{pointHistory}, #{historyComment}, #{resultComment}, NOW())
     </insert>
 
-    <select id="getPointHistory" parameterType="Long" resultType="com.msm.nogari.core.dto.member.PointHistoryDto">
+    <select id="getPointHistory" parameterType="Long" resultType="com.msm.nogari.core.dao.member.PointHistoryDao">
         SELECT
             *
         FROM nogari_member.point_history
         WHERE memberSeq = #{memberSeq}
     </select>
 
-    <select id="getPointHistoryToday" parameterType="Long" resultType="com.msm.nogari.core.dto.member.PointHistoryDto">
+    <select id="getPointHistoryToday" parameterType="Long" resultType="com.msm.nogari.core.dao.member.PointHistoryDao">
         SELECT
             *
         FROM nogari_member.point_history
         WHERE memberSeq = #{memberSeq} AND DATE_FORMAT(regDt, '%Y-%m-%d') = DATE_FORMAT(CURRENT_DATE(), '%Y-%m-%d')
     </select>
 
-    <select id="getNotification" parameterType="Long" resultType="com.msm.nogari.core.dto.member.NotificationDto">
+    <select id="getNotification" parameterType="Long" resultType="com.msm.nogari.core.dao.member.NotificationDao">
         SELECT
             *
         FROM nogari_member.notification
         WHERE memberSeq = #{memberSeq} ORDER BY regDt DESC
     </select>
 
-    <insert id="setNotification" parameterType="com.msm.nogari.core.dto.member.NotificationDto">
+    <insert id="setNotification" parameterType="com.msm.nogari.core.dao.member.NotificationDao">
         INSERT INTO nogari_member.notification
             (memberSeq, type, message, boardSeq, regDt)
         VALUES
             (#{memberSeq}, #{type}, #{message}, #{boardSeq}, NOW())
     </insert>
 
-    <select id="getLevelAndPoint" parameterType="Long" resultType="com.msm.nogari.core.dto.member.LevelDto">
+    <select id="getLevelAndPoint" parameterType="Long" resultType="com.msm.nogari.core.dao.member.LevelDao">
         SELECT
             *
         FROM nogari_member.level
         WHERE memberSeq = #{memberSeq}
     </select>
 
-    <insert id="setLevelAndPoint" parameterType="com.msm.nogari.core.dto.member.LevelDto">
+    <insert id="setLevelAndPoint" parameterType="com.msm.nogari.core.dao.member.LevelDao">
         INSERT INTO nogari_member.level
             (memberSeq, level, point, regDt)
         VALUES
             (#{memberSeq}, #{level}, #{point}, NOW())
     </insert>
 
-    <update id="updateLevelAndPoint" parameterType="com.msm.nogari.core.dto.member.LevelDto">
+    <update id="updateLevelAndPoint" parameterType="com.msm.nogari.core.dao.member.LevelDao">
         UPDATE nogari_member.level
         SET
             level = #{level},

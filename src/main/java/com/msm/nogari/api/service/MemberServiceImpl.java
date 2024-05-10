@@ -1,6 +1,6 @@
 package com.msm.nogari.api.service;
 
-import com.msm.nogari.core.dao.member.MemberDao;
+import com.msm.nogari.core.dao.member.*;
 import com.msm.nogari.core.dto.member.*;
 import com.msm.nogari.core.enums.MemberStatus;
 import com.msm.nogari.core.enums.NotificationType;
@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author 최대희
@@ -51,7 +52,7 @@ public class MemberServiceImpl implements MemberService {
 
 				PointHistoryDto resultHistoryDto = PointHistory.getResultComment(pointHistoryDto);
 
-				memberMapper.setPointHistory(resultHistoryDto);
+				memberMapper.setPointHistory(PointHistoryDao.of(resultHistoryDto));
 
 				// Level and Point Set
 				// 여기는 level table 에 들어갈 데이터 set 첫 가입이기에 무조건 1레벨, 출석 10포인트
@@ -59,7 +60,7 @@ public class MemberServiceImpl implements MemberService {
 				levelDto.setMemberSeq(saveData.getMemberSeq());
 				levelDto.setPoint(resultHistoryDto.getPoint());
 				levelDto.setLevel(1);
-				memberMapper.setLevelAndPoint(levelDto);
+				memberMapper.setLevelAndPoint(LevelDao.of(levelDto));
 
 				// Notification Set
 				NotificationDto notificationDto = new NotificationDto();
@@ -67,12 +68,12 @@ public class MemberServiceImpl implements MemberService {
 				notificationDto.setType(NotificationType.REGISTRATION);
 				notificationDto.setMessage("노가리 가입을 축하드립니다!");
 				notificationDto.setBoardSeq(resultHistoryDto.getBoardSeq());
-				memberMapper.setNotification(notificationDto);
+				memberMapper.setNotification(NotificationDao.of(notificationDto));
 
 				// 가입때는 이례적으로 2개의 notification 이 set 됨 가입, 출석
 				notificationDto.setType(NotificationType.ATTENDANCE);
 				notificationDto.setMessage(resultHistoryDto.getResultComment());
-				memberMapper.setNotification(notificationDto);
+				memberMapper.setNotification(NotificationDao.of(notificationDto));
 
 				// 회원가입이 됐으면 memberSeq 를 리턴해서 Flutter sharedpreference 에 저장해줘야함
 				return saveData.getMemberSeq();
@@ -97,7 +98,7 @@ public class MemberServiceImpl implements MemberService {
 				// 허용이든 아니든 mapper 에서 or 써서 확인가능
 				// ios용 멤버확인 mapper 하나 만들면됨
 				// ios용 멤버확인 mapper 필요 device == ios 의 경우 email or identifier 로 확인하면 될듯
-				MemberDao memberDao = memberMapper.getIosMemberStatus(memberDto);
+				MemberDao memberDao = memberMapper.getIosMemberStatus(MemberDao.of(memberDto, memberDto.getEmail()));
 				if (memberDao == null) {
 					return MemberStatus.UNSUBSCRIBED;
 				} else {
@@ -140,7 +141,7 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public boolean changeDeviceToken(MemberDto memberDto) {
-		return memberMapper.updateDeviceToken(memberDto);
+		return memberMapper.updateDeviceToken(MemberDao.of(memberDto, ""));
 	}
 
 	@Override
@@ -150,7 +151,7 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public boolean updateNickName(MemberDto memberDto) {
-		return memberMapper.updateNickName(memberDto);
+		return memberMapper.updateNickName(MemberDao.of(memberDto, ""));
 	}
 
 	@Override
@@ -161,7 +162,7 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public boolean withdrawalMember(WithdrawalMemberDto withdrawalMemberDto) throws Exception {
 		try {
-			boolean deleteResult = memberMapper.withdrawalMember(withdrawalMemberDto);
+			boolean deleteResult = memberMapper.withdrawalMember(WithdrawalMemberDao.of(withdrawalMemberDto));
 			boolean updateResult = memberMapper.updateStatus(withdrawalMemberDto.getMemberSeq(), MemberStatus.WITHDRAWAL);
 			return deleteResult && updateResult;
 		} catch (Exception e) {
@@ -172,17 +173,22 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public Long blockMember(BlockDto blockDto) {
-		return memberMapper.blockMember(blockDto);
+		return memberMapper.blockMember(BlockDao.of(blockDto));
 	}
 
 	@Override
 	public List<BlockDto> getBlockMember(Long memberSeq) {
-		return memberMapper.getBlockMember(memberSeq);
+		return memberMapper.getBlockMember(memberSeq).stream()
+			.map(BlockDto::of)
+			.collect(Collectors.toList());
 	}
 
 	@Override
 	public boolean deleteBlockMember(List<BlockDto> blockDtoList) {
-		return memberMapper.deleteBlockMember(blockDtoList);
+		List<BlockDao> daoList = blockDtoList.stream()
+			.map(BlockDao::of)
+			.collect(Collectors.toList());
+		return memberMapper.deleteBlockMember(daoList);
 	}
 
 	@Override
@@ -190,7 +196,7 @@ public class MemberServiceImpl implements MemberService {
 	public boolean setPoint(PointHistoryDto pointHistoryDto) {
 		// 여기서 먼저 광고로 왔느냐 출석으로 왔느냐 확인, 글쓰기, 댓글의 경우 작성할 때 이미 처리를 하기 때문에 여기서는 오지 않음
 
-		List<PointHistoryDto> pointHistoryDtoList = memberMapper.getPointHistoryToday(pointHistoryDto.getMemberSeq());
+		List<PointHistoryDto> pointHistoryDtoList = memberMapper.getPointHistoryToday(pointHistoryDto.getMemberSeq()).stream().map(PointHistoryDto::of).collect(Collectors.toList());
 
 		if (pointHistoryDto.getPointHistory() == PointHistory.ATTENDANCE) {
 			int attendanceCnt = 0;
@@ -218,7 +224,7 @@ public class MemberServiceImpl implements MemberService {
 
 				resultHistoryDto = PointHistory.getResultComment(updatePointHistoryDto);
 
-				memberMapper.setPointHistory(resultHistoryDto);
+				memberMapper.setPointHistory(PointHistoryDao.of(resultHistoryDto));
 
 				// Level and Point Set
 				updateLevelByPoint(pointHistoryDto.getMemberSeq(), updatePointHistoryDto.getPoint());
@@ -229,7 +235,7 @@ public class MemberServiceImpl implements MemberService {
 				notificationDto.setType(NotificationType.ATTENDANCE);
 				notificationDto.setMessage(resultHistoryDto.getResultComment());
 				notificationDto.setBoardSeq(resultHistoryDto.getBoardSeq());
-				memberMapper.setNotification(notificationDto);
+				memberMapper.setNotification(NotificationDao.of(notificationDto));
 
 				return true;
 			}
@@ -258,7 +264,7 @@ public class MemberServiceImpl implements MemberService {
 						updatePointHistoryDto.setHistoryComment(PointHistory.WATCH_5SEC_AD.getText());
 						resultHistoryDto = PointHistory.getResultComment(updatePointHistoryDto);
 
-						memberMapper.setPointHistory(resultHistoryDto);
+						memberMapper.setPointHistory(PointHistoryDao.of(resultHistoryDto));
 
 						// Level and Point Set
 						updateLevelByPoint(pointHistoryDto.getMemberSeq(), updatePointHistoryDto.getPoint());
@@ -269,7 +275,7 @@ public class MemberServiceImpl implements MemberService {
 						notificationDto.setType(NotificationType.WATCH_5SEC_AD);
 						notificationDto.setMessage(resultHistoryDto.getResultComment());
 						notificationDto.setBoardSeq(resultHistoryDto.getBoardSeq());
-						memberMapper.setNotification(notificationDto);
+						memberMapper.setNotification(NotificationDao.of(notificationDto));
 					}
 					break;
 				case WATCH_30SEC_AD:
@@ -289,7 +295,7 @@ public class MemberServiceImpl implements MemberService {
 						updatePointHistoryDto.setHistoryComment(PointHistory.WATCH_30SEC_AD.getText());
 						resultHistoryDto = PointHistory.getResultComment(updatePointHistoryDto);
 
-						memberMapper.setPointHistory(resultHistoryDto);
+						memberMapper.setPointHistory(PointHistoryDao.of(resultHistoryDto));
 
 						// Level and Point Set
 						updateLevelByPoint(pointHistoryDto.getMemberSeq(), updatePointHistoryDto.getPoint());
@@ -300,7 +306,7 @@ public class MemberServiceImpl implements MemberService {
 						notificationDto.setType(NotificationType.WATCH_30SEC_AD);
 						notificationDto.setMessage(resultHistoryDto.getResultComment());
 						notificationDto.setBoardSeq(resultHistoryDto.getBoardSeq());
-						memberMapper.setNotification(notificationDto);
+						memberMapper.setNotification(NotificationDao.of(notificationDto));
 					}
 					break;
 				case COMMUNITY_WRITING:
@@ -320,7 +326,7 @@ public class MemberServiceImpl implements MemberService {
 						updatePointHistoryDto.setHistoryComment(PointHistory.COMMUNITY_WRITING.getText());
 						resultHistoryDto = PointHistory.getResultComment(updatePointHistoryDto);
 
-						memberMapper.setPointHistory(resultHistoryDto);
+						memberMapper.setPointHistory(PointHistoryDao.of(resultHistoryDto));
 
 						// Level and Point Set
 						updateLevelByPoint(pointHistoryDto.getMemberSeq(), updatePointHistoryDto.getPoint());
@@ -331,7 +337,7 @@ public class MemberServiceImpl implements MemberService {
 						notificationDto.setType(NotificationType.COMMUNITY_BOARD);
 						notificationDto.setMessage(resultHistoryDto.getResultComment());
 						notificationDto.setBoardSeq(resultHistoryDto.getBoardSeq());
-						memberMapper.setNotification(notificationDto);
+						memberMapper.setNotification(NotificationDao.of(notificationDto));
 					}
 					break;
 				case COMMUNITY_COMMENT:
@@ -351,7 +357,7 @@ public class MemberServiceImpl implements MemberService {
 						updatePointHistoryDto.setHistoryComment(PointHistory.COMMUNITY_COMMENT.getText());
 						resultHistoryDto = PointHistory.getResultComment(updatePointHistoryDto);
 
-						memberMapper.setPointHistory(resultHistoryDto);
+						memberMapper.setPointHistory(PointHistoryDao.of(resultHistoryDto));
 
 						// Level and Point Set
 						updateLevelByPoint(pointHistoryDto.getMemberSeq(), updatePointHistoryDto.getPoint());
@@ -362,7 +368,7 @@ public class MemberServiceImpl implements MemberService {
 						notificationDto.setType(NotificationType.COMMUNITY_COMMENT);
 						notificationDto.setMessage(resultHistoryDto.getResultComment());
 						notificationDto.setBoardSeq(resultHistoryDto.getBoardSeq());
-						memberMapper.setNotification(notificationDto);
+						memberMapper.setNotification(NotificationDao.of(notificationDto));
 					}
 					break;
 				case REVIEW_WRITING:
@@ -382,7 +388,7 @@ public class MemberServiceImpl implements MemberService {
 						updatePointHistoryDto.setHistoryComment(PointHistory.REVIEW_WRITING.getText());
 						resultHistoryDto = PointHistory.getResultComment(updatePointHistoryDto);
 
-						memberMapper.setPointHistory(resultHistoryDto);
+						memberMapper.setPointHistory(PointHistoryDao.of(resultHistoryDto));
 
 						// Level and Point Set
 						updateLevelByPoint(pointHistoryDto.getMemberSeq(), updatePointHistoryDto.getPoint());
@@ -393,7 +399,7 @@ public class MemberServiceImpl implements MemberService {
 						notificationDto.setType(NotificationType.REVIEW_BOARD);
 						notificationDto.setMessage(resultHistoryDto.getResultComment());
 						notificationDto.setBoardSeq(resultHistoryDto.getBoardSeq());
-						memberMapper.setNotification(notificationDto);
+						memberMapper.setNotification(NotificationDao.of(notificationDto));
 					}
 					break;
 				case REVIEW_COMMENT:
@@ -413,7 +419,7 @@ public class MemberServiceImpl implements MemberService {
 						updatePointHistoryDto.setHistoryComment(PointHistory.REVIEW_COMMENT.getText());
 						resultHistoryDto = PointHistory.getResultComment(updatePointHistoryDto);
 
-						memberMapper.setPointHistory(resultHistoryDto);
+						memberMapper.setPointHistory(PointHistoryDao.of(resultHistoryDto));
 
 						// Level and Point Set
 						updateLevelByPoint(pointHistoryDto.getMemberSeq(), updatePointHistoryDto.getPoint());
@@ -424,7 +430,7 @@ public class MemberServiceImpl implements MemberService {
 						notificationDto.setType(NotificationType.REVIEW_COMMENT);
 						notificationDto.setMessage(resultHistoryDto.getResultComment());
 						notificationDto.setBoardSeq(resultHistoryDto.getBoardSeq());
-						memberMapper.setNotification(notificationDto);
+						memberMapper.setNotification(NotificationDao.of(notificationDto));
 					}
 					break;
 			}
@@ -439,22 +445,28 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public List<PointHistoryDto> getPointHistory(Long memberSeq) {
-		return memberMapper.getPointHistory(memberSeq);
+		return memberMapper.getPointHistory(memberSeq).stream()
+			.map(PointHistoryDto::of)
+			.collect(Collectors.toList());
 	}
 
 	@Override
 	public List<PointHistoryDto> getPointHistoryToday(Long memberSeq) {
-		return memberMapper.getPointHistoryToday(memberSeq);
+		return memberMapper.getPointHistoryToday(memberSeq).stream()
+			.map(PointHistoryDto::of)
+			.collect(Collectors.toList());
 	}
 
 	@Override
 	public boolean setPointHistory(PointHistoryDto pointHistoryDto) {
-		return memberMapper.setPointHistory(pointHistoryDto);
+		return memberMapper.setPointHistory(PointHistoryDao.of(pointHistoryDto));
 	}
 
 	@Override
 	public List<NotificationDto> getNotification(Long memberSeq) {
-		return memberMapper.getNotification(memberSeq);
+		return memberMapper.getNotification(memberSeq).stream()
+			.map(NotificationDto::of)
+			.collect(Collectors.toList());
 	}
 
 	@Override
@@ -483,11 +495,6 @@ public class MemberServiceImpl implements MemberService {
 			accumulatedPoint -= pointsNeededForUpgrade;
 		}
 
-		System.out.println("테스트");
-		System.out.println("currentLevel = " + currentLevel);
-		System.out.println("currentPoint = " + currentPoint);
-		System.out.println("accumulatedPoint = " + accumulatedPoint);
-
 		LevelDto resultDto = new LevelDto();
 		resultDto.setLevelSeq(levelDto.getLevelSeq());
 		resultDto.setMemberSeq(levelDto.getMemberSeq());
@@ -495,7 +502,7 @@ public class MemberServiceImpl implements MemberService {
 		resultDto.setPoint(currentPoint);
 
 		// 레벨과 포인트 업데이트
-		return memberMapper.updateLevelAndPoint(resultDto);
+		return memberMapper.updateLevelAndPoint(LevelDao.of(resultDto));
 	}
 
 	@Override

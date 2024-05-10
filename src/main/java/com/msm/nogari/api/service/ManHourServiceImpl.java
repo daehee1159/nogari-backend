@@ -1,5 +1,6 @@
 package com.msm.nogari.api.service;
 
+import com.msm.nogari.core.dao.man_hour.ManHourDao;
 import com.msm.nogari.core.dto.man_hour.ManHourDto;
 import com.msm.nogari.core.dto.man_hour.ManHourHistoryDto;
 import com.msm.nogari.core.mapper.ManHourMapper;
@@ -12,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author 최대희
@@ -29,7 +31,7 @@ public class ManHourServiceImpl implements ManHourService {
 		try {
 			// for문으로 하나씩 저장
 			for (ManHourDto manHourDto : manHourDtoList) {
-				manHourMapper.setManHour(manHourDto);
+				manHourMapper.setManHour(ManHourDao.of(manHourDto));
 			}
 			return true;
 		} catch (Exception e) {
@@ -39,12 +41,14 @@ public class ManHourServiceImpl implements ManHourService {
 
 	@Override
 	public List<ManHourDto> getManHourList(Long memberSeq) {
-		return manHourMapper.getManHourList(memberSeq);
+		return manHourMapper.getManHourList(memberSeq).stream()
+			.map(ManHourDto::of)
+			.collect(Collectors.toList());
 	}
 
 	@Override
 	public boolean updateManHour(ManHourDto manHourDto) {
-		return manHourMapper.updateManHour(manHourDto);
+		return manHourMapper.updateManHour(ManHourDao.of(manHourDto));
 	}
 
 	@Override
@@ -59,10 +63,13 @@ public class ManHourServiceImpl implements ManHourService {
 	}
 
 	@Override
-	public List<ManHourHistoryDto> getManHourHistory(Long memberSeq, String startDt, String endDt) {
+	public List<ManHourDto> getManHourHistory(Long memberSeq, String startDt, String endDt) {
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		LocalDateTime start = LocalDateTime.parse(startDt);
 		LocalDateTime end = LocalDateTime.parse(endDt);
-		return manHourMapper.getManHourHistory(memberSeq, start, end);
+
+		return manHourMapper.getManHourHistory(memberSeq, start, end).stream()
+			.map(ManHourDto::of)
+			.collect(Collectors.toList());
 	}
 }

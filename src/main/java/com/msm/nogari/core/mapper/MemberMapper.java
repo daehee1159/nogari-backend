@@ -1,6 +1,6 @@
 package com.msm.nogari.core.mapper;
 
-import com.msm.nogari.core.dao.member.MemberDao;
+import com.msm.nogari.core.dao.member.*;
 import com.msm.nogari.core.dto.member.*;
 import com.msm.nogari.core.enums.MemberStatus;
 import org.apache.ibatis.annotations.Mapper;
@@ -21,39 +21,39 @@ public interface MemberMapper {
 	MemberDao getMemberInfoByUsername(String username);
 
 	MemberDao isDuplicateEmail(String email);
-	MemberDao getIosMemberStatus(MemberDto memberDto);
+	MemberDao getIosMemberStatus(MemberDao memberDao);
 
 	MemberDao isDuplicateNickName(String nickName);
 
 	String getDeviceToken(Long memberSeq);
 
-	boolean updateDeviceToken(MemberDto memberDto);
+	boolean updateDeviceToken(MemberDao memberDao);
 
 	MemberDao getMemberInfo(Long memberSeq);
-	boolean updateNickName(MemberDto memberDto);
+	boolean updateNickName(MemberDao memberDao);
 
-	boolean withdrawalMember(WithdrawalMemberDto withdrawalMemberDto);
+	boolean withdrawalMember(WithdrawalMemberDao withdrawalMemberDao);
 
-	Long blockMember(BlockDto blockDto);
+	Long blockMember(BlockDao blockDao);
 
-	List<BlockDto> getBlockMember(Long memberSeq);
+	List<BlockDao> getBlockMember(Long memberSeq);
 
-	boolean deleteBlockMember(@Param("blockDtoList") List<BlockDto> blockDtoList);
+	boolean deleteBlockMember(@Param("blockDtoList") List<BlockDao> blockDaoList);
 	boolean updateStatus(@Param("memberSeq") Long memberSeq, @Param("status") MemberStatus status);
 
-	boolean setPointHistory(PointHistoryDto pointHistoryDto);
+	boolean setPointHistory(PointHistoryDao pointHistoryDao);
 	LevelDto getLevelAndPoint(Long memberSeq);
 
-	List<PointHistoryDto> getPointHistory(Long memberSeq);
-	List<PointHistoryDto> getPointHistoryToday(Long memberSeq);
+	List<PointHistoryDao> getPointHistory(Long memberSeq);
+	List<PointHistoryDao> getPointHistoryToday(Long memberSeq);
 
-	List<NotificationDto> getNotification(Long memberSeq);
+	List<NotificationDao> getNotification(Long memberSeq);
 
-	boolean setNotification(NotificationDto notificationDto);
+	boolean setNotification(NotificationDao notificationDao);
 
 	LevelDto getLevelData(Long memberSeq);
 
-	boolean setLevelAndPoint(LevelDto levelDto);
+	boolean setLevelAndPoint(LevelDao levelDao);
 
-	boolean updateLevelAndPoint(LevelDto levelDto);
+	boolean updateLevelAndPoint(LevelDao levelDao);
 }

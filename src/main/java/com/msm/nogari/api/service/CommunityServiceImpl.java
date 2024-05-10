@@ -1,5 +1,11 @@
 package com.msm.nogari.api.service;
 
+import com.msm.nogari.core.dao.board.community.BoardDao;
+import com.msm.nogari.core.dao.board.community.BoardLikeDao;
+import com.msm.nogari.core.dao.board.community.ChildCommentDao;
+import com.msm.nogari.core.dao.board.community.CommentDao;
+import com.msm.nogari.core.dao.member.NotificationDao;
+import com.msm.nogari.core.dao.member.PointHistoryDao;
 import com.msm.nogari.core.dto.board.community.BoardDto;
 import com.msm.nogari.core.dto.board.community.BoardLikeDto;
 import com.msm.nogari.core.dto.board.community.ChildCommentDto;
@@ -15,10 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author 최대희
@@ -35,9 +39,9 @@ public class CommunityServiceImpl implements CommunityService {
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean setCommunity(BoardDto boardDto) {
-		boolean result = communityMapper.setCommunity(boardDto);
+		boolean result = communityMapper.setCommunity(BoardDao.of(boardDto));
 
-		List<PointHistoryDto> pointHistoryDtoList = memberMapper.getPointHistoryToday(boardDto.getMemberSeq());
+		List<PointHistoryDto> pointHistoryDtoList = memberMapper.getPointHistoryToday(boardDto.getMemberSeq()).stream().map(PointHistoryDto::of).collect(Collectors.toList());
 		int communityWritingCnt = 0;
 
 		for (int i = 0; i < pointHistoryDtoList.size(); i++) {
@@ -61,7 +65,7 @@ public class CommunityServiceImpl implements CommunityService {
 
 		resultHistoryDto = PointHistory.getResultComment(pointHistoryDto);
 
-		memberMapper.setPointHistory(resultHistoryDto);
+		memberMapper.setPointHistory(PointHistoryDao.of(resultHistoryDto));
 
 		// Level and Point Set
 		memberService.updateLevelByPoint(boardDto.getMemberSeq(), pointHistoryDto.getPoint());
@@ -72,24 +76,30 @@ public class CommunityServiceImpl implements CommunityService {
 		notificationDto.setType(NotificationType.COMMUNITY_BOARD);
 		notificationDto.setMessage(resultHistoryDto.getResultComment());
 		notificationDto.setBoardSeq(resultHistoryDto.getBoardSeq());
-		memberMapper.setNotification(notificationDto);
+		memberMapper.setNotification(NotificationDao.of(notificationDto));
 
 		return result;
 	}
 
 	@Override
 	public List<BoardDto> getAllCommunity() {
-		return communityMapper.getAllCommunity();
+		return communityMapper.getAllCommunity().stream()
+			.map(BoardDto::of)
+			.collect(Collectors.toList());
 	}
 
 	@Override
 	public List<BoardDto> getLikeCommunity(int likeCount) {
-		return communityMapper.getLikeCommunity(likeCount);
+		return communityMapper.getLikeCommunity(likeCount).stream()
+			.map(BoardDto::of)
+			.collect(Collectors.toList());
 	}
 
 	@Override
 	public List<BoardDto> getNoticeCommunity() {
-		return communityMapper.getNoticeCommunity();
+		return communityMapper.getNoticeCommunity().stream()
+			.map(BoardDto::of)
+			.collect(Collectors.toList());
 	}
 
 	@Override
@@ -101,7 +111,9 @@ public class CommunityServiceImpl implements CommunityService {
 		} else {
 			map.put("keyword", keyword);
 		}
-		return communityMapper.searchBoard(map);
+		return communityMapper.searchBoard(map).stream()
+			.map(BoardDto::of)
+			.collect(Collectors.toList());
 	}
 
 	@Override
@@ -126,17 +138,19 @@ public class CommunityServiceImpl implements CommunityService {
 
 	@Override
 	public BoardDto getCommunityByIdx(Long boardSeq) {
-		return communityMapper.getCommunityByIdx(boardSeq);
+		return BoardDto.of(communityMapper.getCommunityByIdx(boardSeq));
 	}
 
 	@Override
 	public List<BoardDto> getCommunity(Long memberSeq) {
-		return communityMapper.getCommunity(memberSeq);
+		return communityMapper.getCommunity(memberSeq).stream()
+			.map(BoardDto::of)
+			.collect(Collectors.toList());
 	}
 
 	@Override
 	public boolean updateCommunity(BoardDto boardDto) {
-		return communityMapper.updateCommunity(boardDto);
+		return communityMapper.updateCommunity(BoardDao.of(boardDto));
 	}
 
 	@Override
@@ -151,24 +165,26 @@ public class CommunityServiceImpl implements CommunityService {
 
 	@Override
 	public List<BoardLikeDto> getBoardLikeCnt(Long boardSeq) {
-		return communityMapper.getBoardLikeCnt(boardSeq);
+		return communityMapper.getBoardLikeCnt(boardSeq).stream()
+			.map(BoardLikeDto::of)
+			.collect(Collectors.toList());
 	}
 
 	@Override
 	public boolean setBoardLike(BoardLikeDto boardLikeDto) {
-		return communityMapper.setBoardLike(boardLikeDto);
+		return communityMapper.setBoardLike(BoardLikeDao.of(boardLikeDto));
 	}
 
 	@Override
 	public boolean deleteBoardLike(BoardLikeDto boardLikeDto) {
-		return communityMapper.deleteBoardLike(boardLikeDto);
+		return communityMapper.deleteBoardLike(BoardLikeDao.of(boardLikeDto));
 	}
 
 	@Override
 	public Long setComment(CommentDto commentDto) {
-		boolean result = communityMapper.setComment(commentDto);
+		boolean result = communityMapper.setComment(CommentDao.of(commentDto));
 
-		List<PointHistoryDto> pointHistoryDtoList = memberMapper.getPointHistoryToday(commentDto.getMemberSeq());
+		List<PointHistoryDto> pointHistoryDtoList = memberMapper.getPointHistoryToday(commentDto.getMemberSeq()).stream().map(PointHistoryDto::of).collect(Collectors.toList());
 		int communityCommentCnt = 0;
 
 		for (int i = 0; i < pointHistoryDtoList.size(); i++) {
@@ -192,7 +208,7 @@ public class CommunityServiceImpl implements CommunityService {
 
 		resultHistoryDto = PointHistory.getResultComment(pointHistoryDto);
 
-		memberMapper.setPointHistory(resultHistoryDto);
+		memberMapper.setPointHistory(PointHistoryDao.of(resultHistoryDto));
 
 		// Level and Point Set
 		memberService.updateLevelByPoint(commentDto.getMemberSeq(), pointHistoryDto.getPoint());
@@ -203,7 +219,7 @@ public class CommunityServiceImpl implements CommunityService {
 		notificationDto.setType(NotificationType.COMMUNITY_COMMENT);
 		notificationDto.setMessage(resultHistoryDto.getResultComment());
 		notificationDto.setBoardSeq(resultHistoryDto.getBoardSeq());
-		memberMapper.setNotification(notificationDto);
+		memberMapper.setNotification(NotificationDao.of(notificationDto));
 
 		if (commentDto.getCommentSeq() != null) {
 			return commentDto.getCommentSeq();
@@ -214,7 +230,9 @@ public class CommunityServiceImpl implements CommunityService {
 
 	@Override
 	public List<CommentDto> getComment(Long boardSeq) {
-		return communityMapper.getComment(boardSeq);
+		return communityMapper.getComment(boardSeq).stream()
+			.map(CommentDto::of)
+			.collect(Collectors.toList());
 	}
 
 	@Override
@@ -229,7 +247,7 @@ public class CommunityServiceImpl implements CommunityService {
 
 	@Override
 	public Long setChildComment(ChildCommentDto childCommentDto) {
-		communityMapper.setChildComment(childCommentDto);
+		communityMapper.setChildComment(ChildCommentDao.of(childCommentDto));
 
 		if (childCommentDto.getChildCommentSeq() != null) {
 			return childCommentDto.getChildCommentSeq();
@@ -240,7 +258,9 @@ public class CommunityServiceImpl implements CommunityService {
 
 	@Override
 	public List<ChildCommentDto> getChildComment(Long boardSeq, Long commentSeq) {
-		return communityMapper.getChildComment(boardSeq, commentSeq);
+		return communityMapper.getChildComment(boardSeq, commentSeq).stream()
+			.map(ChildCommentDto::of)
+			.collect(Collectors.toList());
 	}
 
 	@Override

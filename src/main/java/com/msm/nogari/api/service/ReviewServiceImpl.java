@@ -1,5 +1,11 @@
 package com.msm.nogari.api.service;
 
+import com.msm.nogari.core.dao.board.review.ReviewBoardDao;
+import com.msm.nogari.core.dao.board.review.ReviewBoardLikeDao;
+import com.msm.nogari.core.dao.board.review.ReviewChildCommentDao;
+import com.msm.nogari.core.dao.board.review.ReviewCommentDao;
+import com.msm.nogari.core.dao.member.NotificationDao;
+import com.msm.nogari.core.dao.member.PointHistoryDao;
 import com.msm.nogari.core.dto.board.review.ReviewBoardDto;
 import com.msm.nogari.core.dto.board.review.ReviewBoardLikeDto;
 import com.msm.nogari.core.dto.board.review.ReviewChildCommentDto;
@@ -18,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author 최대희
@@ -33,9 +40,9 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	public boolean setReview(ReviewBoardDto reviewBoardDto) {
-		boolean result = reviewMapper.setReview(reviewBoardDto);
+		boolean result = reviewMapper.setReview(ReviewBoardDao.of(reviewBoardDto));
 
-		List<PointHistoryDto> pointHistoryDtoList = memberMapper.getPointHistoryToday(reviewBoardDto.getMemberSeq());
+		List<PointHistoryDto> pointHistoryDtoList = memberMapper.getPointHistoryToday(reviewBoardDto.getMemberSeq()).stream().map(PointHistoryDto::of).collect(Collectors.toList());
 		int reviewWritingCnt = 0;
 
 		for (int i = 0; i < pointHistoryDtoList.size(); i++) {
@@ -59,7 +66,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 		resultHistoryDto = PointHistory.getResultComment(pointHistoryDto);
 
-		memberMapper.setPointHistory(resultHistoryDto);
+		memberMapper.setPointHistory(PointHistoryDao.of(resultHistoryDto));
 
 		// Level and Point Set
 		memberService.updateLevelByPoint(reviewBoardDto.getMemberSeq(), pointHistoryDto.getPoint());
@@ -70,24 +77,30 @@ public class ReviewServiceImpl implements ReviewService {
 		notificationDto.setType(NotificationType.REVIEW_BOARD);
 		notificationDto.setMessage(resultHistoryDto.getResultComment());
 		notificationDto.setBoardSeq(resultHistoryDto.getBoardSeq());
-		memberMapper.setNotification(notificationDto);
+		memberMapper.setNotification(NotificationDao.of(notificationDto));
 
 		return result;
 	}
 
 	@Override
 	public List<ReviewBoardDto> getAllReview() {
-		return reviewMapper.getAllReview();
+		return reviewMapper.getAllReview().stream()
+			.map(ReviewBoardDto::of)
+			.collect(Collectors.toList());
 	}
 
 	@Override
 	public List<ReviewBoardDto> getLikeReview(int likeCount) {
-		return reviewMapper.getLikeReview(likeCount);
+		return reviewMapper.getLikeReview(likeCount).stream()
+			.map(ReviewBoardDto::of)
+			.collect(Collectors.toList());
 	}
 
 	@Override
 	public List<ReviewBoardDto> getNoticeCommunity() {
-		return reviewMapper.getNoticeReview();
+		return reviewMapper.getNoticeReview().stream()
+			.map(ReviewBoardDto::of)
+			.collect(Collectors.toList());
 	}
 
 	@Override
@@ -99,7 +112,9 @@ public class ReviewServiceImpl implements ReviewService {
 		} else {
 			map.put("keyword", keyword);
 		}
-		return reviewMapper.searchReviewBoard(map);
+		return reviewMapper.searchReviewBoard(map).stream()
+			.map(ReviewBoardDto::of)
+			.collect(Collectors.toList());
 	}
 
 	@Override
@@ -124,12 +139,14 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	public ReviewBoardDto getReviewBySeq(Long boardSeq) {
-		return reviewMapper.getReviewByIdx(boardSeq);
+		return ReviewBoardDto.of(reviewMapper.getReviewByIdx(boardSeq));
 	}
 
 	@Override
 	public List<ReviewBoardDto> getMyReview(Long memberSeq) {
-		return reviewMapper.getReview(memberSeq);
+		return reviewMapper.getReview(memberSeq).stream()
+			.map(ReviewBoardDto::of)
+			.collect(Collectors.toList());
 	}
 
 	@Override
@@ -144,24 +161,26 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	public List<ReviewBoardLikeDto> getBoardLikeCnt(Long boardSeq) {
-		return reviewMapper.getBoardLikeCnt(boardSeq);
+		return reviewMapper.getBoardLikeCnt(boardSeq).stream()
+			.map(ReviewBoardLikeDto::of)
+			.collect(Collectors.toList());
 	}
 
 	@Override
 	public boolean setBoardLike(ReviewBoardLikeDto reviewBoardLikeDto) {
-		return reviewMapper.setBoardLike(reviewBoardLikeDto);
+		return reviewMapper.setBoardLike(ReviewBoardLikeDao.of(reviewBoardLikeDto));
 	}
 
 	@Override
 	public boolean deleteBoardLike(ReviewBoardLikeDto reviewBoardLikeDto) {
-		return reviewMapper.deleteBoardLike(reviewBoardLikeDto);
+		return reviewMapper.deleteBoardLike(ReviewBoardLikeDao.of(reviewBoardLikeDto));
 	}
 
 	@Override
 	public Long setComment(ReviewCommentDto reviewCommentDto) {
-		boolean result = reviewMapper.setComment(reviewCommentDto);
+		boolean result = reviewMapper.setComment(ReviewCommentDao.of(reviewCommentDto));
 
-		List<PointHistoryDto> pointHistoryDtoList = memberMapper.getPointHistoryToday(reviewCommentDto.getMemberSeq());
+		List<PointHistoryDto> pointHistoryDtoList = memberMapper.getPointHistoryToday(reviewCommentDto.getMemberSeq()).stream().map(PointHistoryDto::of).collect(Collectors.toList());
 		int reviewCommentCnt = 0;
 
 		for (int i = 0; i < pointHistoryDtoList.size(); i++) {
@@ -185,7 +204,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 		resultHistoryDto = PointHistory.getResultComment(pointHistoryDto);
 
-		memberMapper.setPointHistory(resultHistoryDto);
+		memberMapper.setPointHistory(PointHistoryDao.of(resultHistoryDto));
 
 		// Level and Point Set
 		memberService.updateLevelByPoint(reviewCommentDto.getMemberSeq(), pointHistoryDto.getPoint());
@@ -196,7 +215,7 @@ public class ReviewServiceImpl implements ReviewService {
 		notificationDto.setType(NotificationType.REVIEW_COMMENT);
 		notificationDto.setMessage(resultHistoryDto.getResultComment());
 		notificationDto.setBoardSeq(resultHistoryDto.getBoardSeq());
-		memberMapper.setNotification(notificationDto);
+		memberMapper.setNotification(NotificationDao.of(notificationDto));
 
 		if (reviewCommentDto.getCommentSeq() != null) {
 			return reviewCommentDto.getCommentSeq();
@@ -207,7 +226,9 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	public List<ReviewCommentDto> getComment(Long boardSeq) {
-		return reviewMapper.getComment(boardSeq);
+		return reviewMapper.getComment(boardSeq).stream()
+			.map(ReviewCommentDto::of)
+			.collect(Collectors.toList());
 	}
 
 	@Override
@@ -222,12 +243,14 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	public Long setChildComment(ReviewChildCommentDto reviewChildCommentDto) {
-		return reviewMapper.setChildComment(reviewChildCommentDto);
+		return reviewMapper.setChildComment(ReviewChildCommentDao.of(reviewChildCommentDto));
 	}
 
 	@Override
 	public List<ReviewChildCommentDto> getChildComment(Long boardSeq, Long commentSeq) {
-		return reviewMapper.getChildComment(boardSeq, commentSeq);
+		return reviewMapper.getChildComment(boardSeq, commentSeq).stream()
+			.map(ReviewChildCommentDto::of)
+			.collect(Collectors.toList());
 	}
 
 	@Override

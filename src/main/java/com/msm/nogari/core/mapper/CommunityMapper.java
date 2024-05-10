@@ -1,5 +1,9 @@
 package com.msm.nogari.core.mapper;
 
+import com.msm.nogari.core.dao.board.community.BoardDao;
+import com.msm.nogari.core.dao.board.community.BoardLikeDao;
+import com.msm.nogari.core.dao.board.community.ChildCommentDao;
+import com.msm.nogari.core.dao.board.community.CommentDao;
 import com.msm.nogari.core.dto.board.community.BoardDto;
 import com.msm.nogari.core.dto.board.community.BoardLikeDto;
 import com.msm.nogari.core.dto.board.community.ChildCommentDto;
@@ -16,40 +20,40 @@ import java.util.Map;
  */
 @Mapper
 public interface CommunityMapper {
-	boolean setCommunity(BoardDto boardDto);
+	boolean setCommunity(BoardDao boardDao);
 
-	List<BoardDto> getAllCommunity();
+	List<BoardDao> getAllCommunity();
 
-	List<BoardDto> getLikeCommunity(int likeCount);
+	List<BoardDao> getLikeCommunity(int likeCount);
 
-	List<BoardDto> getNoticeCommunity();
+	List<BoardDao> getNoticeCommunity();
 
-	List<BoardDto> searchBoard(Map<String, Object> map);
+	List<BoardDao> searchBoard(Map<String, Object> map);
 
 	int getCntOfComment(Long boardSeq);
-	BoardDto getCommunityByIdx(Long boardSeq);
+	BoardDao getCommunityByIdx(Long boardSeq);
 
 //	List<BoardDto> getCommunity(@Param("memberSeq") Long memberSeq, @Param("p") int p, @Param("size") int size,  @Param("endRow") Long endRow);
 //	List<BoardDto> getCommunity(@Param("memberSeq") Long memberSeq, @Param("p") int p, @Param("size") int size);
 
-	boolean updateCommunity(BoardDto boardDto);
-	List<BoardDto> getCommunity(Long memberSeq);
+	boolean updateCommunity(BoardDao boardDao);
+	List<BoardDao> getCommunity(Long memberSeq);
 
 	boolean deleteCommunity(Long boardSeq);
 	boolean addBoardViewCnt(Long boardSeq);
 
-	List<BoardLikeDto> getBoardLikeCnt(Long boardSeq);
-	boolean setBoardLike(BoardLikeDto boardLikeDto);
-	boolean deleteBoardLike(BoardLikeDto boardLikeDto);
+	List<BoardLikeDao> getBoardLikeCnt(Long boardSeq);
+	boolean setBoardLike(BoardLikeDao boardLikeDto);
+	boolean deleteBoardLike(BoardLikeDao boardLikeDto);
 
 	// 댓글
-	boolean setComment(CommentDto commentDto);
+	boolean setComment(CommentDao commentDao);
 
-	List<CommentDto> getComment(Long boardSeq);
+	List<CommentDao> getComment(Long boardSeq);
 	boolean deleteComment(Long commentSeq);
 
 	// 대댓글
-	List<ChildCommentDto> getChildComment(@Param("boardSeq") Long boardSeq, @Param("commentSeq") Long commentSeq);
-	Long setChildComment(ChildCommentDto childCommentDto);
+	List<ChildCommentDao> getChildComment(@Param("boardSeq") Long boardSeq, @Param("commentSeq") Long commentSeq);
+	Long setChildComment(ChildCommentDao childCommentDao);
 	boolean deleteChildComment(Long childCommentSeq);
 }

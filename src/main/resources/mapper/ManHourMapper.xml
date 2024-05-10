@@ -2,7 +2,7 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.msm.nogari.core.mapper.ManHourMapper">
-    <insert id="setManHour" parameterType="com.msm.nogari.core.dto.man_hour.ManHourDto">
+    <insert id="setManHour" parameterType="com.msm.nogari.core.dao.man_hour.ManHourDao">
         INSERT INTO nogari_man_hour.man_hour
             (
              memberSeq,
@@ -19,21 +19,21 @@
             )
     </insert>
 
-    <select id="getManHourList" parameterType="Long" resultType="com.msm.nogari.core.dto.man_hour.ManHourDto">
+    <select id="getManHourList" parameterType="Long" resultType="com.msm.nogari.core.dao.man_hour.ManHourDao">
         SELECT
             *
         FROM nogari_man_hour.man_hour
         WHERE memberSeq = #{memberSeq} OR isHoliday = 'Y' ORDER BY startDt DESC
     </select>
 
-    <select id="getManHour" parameterType="Long" resultType="com.msm.nogari.core.dto.man_hour.ManHourDto">
+    <select id="getManHour" parameterType="Long" resultType="com.msm.nogari.core.dao.man_hour.ManHourDao">
         SELECT
             *
         FROM nogari_man_hour.man_hour
         WHERE manHourSeq = #{manHourSeq}
     </select>
 
-    <update id="updateManHour" parameterType="com.msm.nogari.core.dto.man_hour.ManHourDto">
+    <update id="updateManHour" parameterType="com.msm.nogari.core.dao.man_hour.ManHourDao">
         UPDATE nogari_man_hour.man_hour
         SET
             manHour = #{manHour},
@@ -52,7 +52,7 @@
         </foreach>
     </delete>
 
-    <select id="getManHourHistory" parameterType="Long" resultType="com.msm.nogari.core.dto.man_hour.ManHourDto">
+    <select id="getManHourHistory" parameterType="Long" resultType="com.msm.nogari.core.dao.man_hour.ManHourDao">
         <![CDATA[
         SELECT
             *

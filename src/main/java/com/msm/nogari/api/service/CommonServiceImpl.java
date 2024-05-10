@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.msm.nogari.NogariApplication;
+import com.msm.nogari.core.dao.common.AppVersionDao;
+import com.msm.nogari.core.dao.common.ReportDao;
+import com.msm.nogari.core.dao.man_hour.ManHourDao;
 import com.msm.nogari.core.dto.common.AppVersionDto;
 import com.msm.nogari.core.dto.common.NewsResponse;
 import com.msm.nogari.core.dto.common.ReportDto;
@@ -57,7 +60,7 @@ public class CommonServiceImpl implements CommonService {
 
 	@Override
 	public AppVersionDto getAppVersion() {
-		return commonMapper.getAppVersion();
+		return AppVersionDto.of(commonMapper.getAppVersion());
 	}
 
 	@Override
@@ -99,7 +102,11 @@ public class CommonServiceImpl implements CommonService {
 						manHourDtoList.add(manHourDto);
 					}
 
-					List<ManHourDto> allHolidayList = commonMapper.getAllHolidays();
+					List<ManHourDto> allHolidayList = new ArrayList<>();
+					List<ManHourDao> daoList = commonMapper.getAllHolidays();
+					for (ManHourDao manHourDao : daoList) {
+						allHolidayList.add(ManHourDto.of(manHourDao));
+					}
 
 					if (!allHolidayList.isEmpty()) {
 						// 공휴일 정보를 담은 리스트에서 기존에 등록된 공휴일은 재등록하지 말아야하기 때문에 필터링
@@ -245,7 +252,7 @@ public class CommonServiceImpl implements CommonService {
 
 	@Override
 	public boolean reportBoard(ReportDto reportDto) {
-		return commonMapper.reportBoard(reportDto);
+		return commonMapper.reportBoard(ReportDao.of(reportDto));
 	}
 
 	private static LocalDateTime convertLocalDateTime(String dateString) {
@@ -257,7 +264,7 @@ public class CommonServiceImpl implements CommonService {
 	public boolean setHolidayList(List<ManHourDto> manHourDtoList) {
 		try {
 			for (ManHourDto manHourDto : manHourDtoList) {
-				commonMapper.setHoliday(manHourDto);
+				commonMapper.setHoliday(ManHourDao.of(manHourDto));
 			}
 			return true;
 		} catch (Exception e) {

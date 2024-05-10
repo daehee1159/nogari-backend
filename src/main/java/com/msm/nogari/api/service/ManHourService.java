@@ -34,5 +34,5 @@ public interface ManHourService {
 	 * 공수 캘린더 이력 보기
 	 * startDt, endDt 기간별로 조회하게 만듬
 	 */
-	List<ManHourHistoryDto> getManHourHistory(Long memberSeq, String startDt, String endDt);
+	List<ManHourDto> getManHourHistory(Long memberSeq, String startDt, String endDt);
 }

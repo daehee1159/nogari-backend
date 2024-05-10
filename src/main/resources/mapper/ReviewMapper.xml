@@ -2,7 +2,7 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.msm.nogari.core.mapper.ReviewMapper">
-    <insert id="setReview" parameterType="com.msm.nogari.core.dto.board.review.ReviewBoardDto">
+    <insert id="setReview" parameterType="com.msm.nogari.core.dao.board.review.ReviewBoardDao">
         INSERT INTO nogari_review.board
         (
             title, rank, period, atmosphere, content,
@@ -17,7 +17,7 @@
             )
     </insert>
 
-    <select id="getAllReview" resultType="com.msm.nogari.core.dto.board.review.ReviewBoardDto">
+    <select id="getAllReview" resultType="com.msm.nogari.core.dao.board.review.ReviewBoardDao">
         SELECT
             b.boardSeq,
             b.title,
@@ -40,19 +40,19 @@
         ORDER BY b.regDt DESC
     </select>
 
-    <select id="getLikeReview" resultType="com.msm.nogari.core.dto.board.review.ReviewBoardDto">
+    <select id="getLikeReview" resultType="com.msm.nogari.core.dao.board.review.ReviewBoardDao">
         SELECT
             *
         FROM nogari_review.board WHERE deleteYN = 'N' AND likeCnt >= #{likeCount} ORDER BY regDt DESC
     </select>
 
-    <select id="getNoticeReview" resultType="com.msm.nogari.core.dto.board.review.ReviewBoardDto">
+    <select id="getNoticeReview" resultType="com.msm.nogari.core.dao.board.review.ReviewBoardDao">
         SELECT
             *
         FROM nogari_review.board WHERE deleteYN = 'N' AND noticeYN = 'Y' ORDER BY regDt DESC
     </select>
 
-    <select id="searchReviewBoard" parameterType="map" resultType="com.msm.nogari.core.dto.board.review.ReviewBoardDto">
+    <select id="searchReviewBoard" parameterType="map" resultType="com.msm.nogari.core.dao.board.review.ReviewBoardDao">
         SELECT
         *
         FROM nogari_review.board
@@ -72,7 +72,7 @@
         </where>
     </select>
 
-    <select id="searchLikeReviewBoard" parameterType="map" resultType="com.msm.nogari.core.dto.board.review.ReviewBoardDto">
+    <select id="searchLikeReviewBoard" parameterType="map" resultType="com.msm.nogari.core.dao.board.review.ReviewBoardDao">
         SELECT
         *
         FROM nogari_review.board
@@ -92,7 +92,7 @@
         </where>
     </select>
 
-    <select id="searchNoticeReviewBoard" parameterType="map" resultType="com.msm.nogari.core.dto.board.review.ReviewBoardDto">
+    <select id="searchNoticeReviewBoard" parameterType="map" resultType="com.msm.nogari.core.dao.board.review.ReviewBoardDao">
         SELECT
         *
         FROM nogari_review.board
@@ -121,21 +121,21 @@
             boardSeq = #{boardSeq} AND deleteYN = 'N'
     </select>
 
-    <select id="getReviewByIdx" parameterType="Long" resultType="com.msm.nogari.core.dto.board.review.ReviewBoardDto">
+    <select id="getReviewByIdx" parameterType="Long" resultType="com.msm.nogari.core.dao.board.review.ReviewBoardDao">
         SELECT
             *
         FROM nogari_review.board
         WHERE boardSeq = #{boardSeq} AND deleteYN = 'N' ORDER BY startDt DESC
     </select>
 
-    <select id="getReview" parameterType="Long" resultType="com.msm.nogari.core.dto.board.review.ReviewBoardDto">
+    <select id="getReview" parameterType="Long" resultType="com.msm.nogari.core.dao.board.review.ReviewBoardDao">
         SELECT
             *
         FROM nogari_review.board
         WHERE memberSeq = #{memberSeq} AND deleteYN = 'N'
     </select>
 
-    <update id="updateReview" parameterType="com.msm.nogari.core.dto.board.review.ReviewBoardDto">
+    <update id="updateReview" parameterType="com.msm.nogari.core.dao.board.review.ReviewBoardDao">
         UPDATE nogari_review.board
         SET
         title = #{title},
@@ -163,14 +163,14 @@
         WHERE boardSeq = #{boardSeq}
     </update>
 
-    <select id="getBoardLikeCnt" parameterType="Long" resultType="com.msm.nogari.core.dto.board.review.ReviewBoardLikeDto">
+    <select id="getBoardLikeCnt" parameterType="Long" resultType="com.msm.nogari.core.dao.board.review.ReviewBoardLikeDao">
         SELECT
             *
         FROM nogari_review.board_like
         WHERE boardSeq = #{boardSeq}
     </select>
 
-    <insert id="setBoardLike" parameterType="com.msm.nogari.core.dto.board.review.ReviewBoardLikeDto">
+    <insert id="setBoardLike" parameterType="com.msm.nogari.core.dao.board.review.ReviewBoardLikeDao">
         INSERT INTO nogari_review.board_like
         (
             boardSeq, memberSeq,
@@ -183,12 +183,12 @@
             )
     </insert>
 
-    <delete id="deleteBoardLike" parameterType="com.msm.nogari.core.dto.board.review.ReviewBoardLikeDto">
+    <delete id="deleteBoardLike" parameterType="com.msm.nogari.core.dao.board.review.ReviewBoardLikeDao">
         DELETE FROM nogari_review.board_like
         WHERE memberSeq = ${memberSeq}
     </delete>
 
-    <insert id="setComment" parameterType="com.msm.nogari.core.dto.board.review.ReviewCommentDto" useGeneratedKeys="true" keyColumn="commentSeq">
+    <insert id="setComment" parameterType="com.msm.nogari.core.dao.board.review.ReviewCommentDao" useGeneratedKeys="true" keyColumn="commentSeq">
         INSERT INTO nogari_review.comment
         (
         boardSeq, memberSeq, nickname,
@@ -206,7 +206,7 @@
         </selectKey>
     </insert>
 
-    <select id="getComment" parameterType="Long" resultType="com.msm.nogari.core.dto.board.review.ReviewCommentDto">
+    <select id="getComment" parameterType="Long" resultType="com.msm.nogari.core.dao.board.review.ReviewCommentDao">
         SELECT
             *
         FROM nogari_review.comment
@@ -221,14 +221,14 @@
         WHERE commentSeq = #{commentSeq}
     </update>
 
-    <select id="getChildComment" parameterType="Long" resultType="com.msm.nogari.core.dto.board.community.ChildCommentDto">
+    <select id="getChildComment" parameterType="Long" resultType="com.msm.nogari.core.dao.board.community.ChildCommentDao">
         SELECT
             *
         FROM nogari_review.child_comment
         WHERE boardSeq = #{boardSeq} AND commentSeq = #{commentSeq} AND deleteYN = 'N'
     </select>
 
-    <insert id="setChildComment" parameterType="com.msm.nogari.core.dto.board.community.ChildCommentDto" useGeneratedKeys="true" keyColumn="childCommentSeq">
+    <insert id="setChildComment" parameterType="com.msm.nogari.core.dao.board.community.ChildCommentDao" useGeneratedKeys="true" keyColumn="childCommentSeq">
         INSERT INTO nogari_review.child_comment
         (
         boardSeq, commentSeq,

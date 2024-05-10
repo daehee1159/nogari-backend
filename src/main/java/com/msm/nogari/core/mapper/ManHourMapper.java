@@ -1,5 +1,7 @@
 package com.msm.nogari.core.mapper;
 
+import com.msm.nogari.core.dao.man_hour.ManHourDao;
+import com.msm.nogari.core.dao.man_hour.ManHourHistoryDao;
 import com.msm.nogari.core.dto.man_hour.ManHourDto;
 import com.msm.nogari.core.dto.man_hour.ManHourHistoryDto;
 import org.apache.ibatis.annotations.Mapper;
@@ -14,15 +16,15 @@ import java.util.List;
  */
 @Mapper
 public interface ManHourMapper {
-	boolean setManHour(ManHourDto manHourDto);
+	boolean setManHour(ManHourDao manHourDao);
 
-	List<ManHourDto> getManHourList(Long memberSeq);
+	List<ManHourDao> getManHourList(Long memberSeq);
 
-	ManHourDto getManHour(Long manHourSeq);
+	ManHourDao getManHour(Long manHourSeq);
 
-	boolean updateManHour(ManHourDto manHourDto);
+	boolean updateManHour(ManHourDao manHourDao);
 
 	boolean deleteManHour(@Param("manHourSeqList") List<Long> manHourSeqList);
 
-	List<ManHourHistoryDto> getManHourHistory(@Param("memberSeq") Long memberSeq, @Param("startDt") LocalDateTime startDt, @Param("endDt") LocalDateTime endDt);
+	List<ManHourDao> getManHourHistory(@Param("memberSeq") Long memberSeq, @Param("startDt") LocalDateTime startDt, @Param("endDt") LocalDateTime endDt);
 }

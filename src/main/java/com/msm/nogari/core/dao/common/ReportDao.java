@@ -30,7 +30,7 @@ public class ReportDao {
 		REVIEW_CHILD_COMMENT
 	}
 
-	private static ReportDao of(ReportDto reportDto) {
+	public static ReportDao of(ReportDto reportDto) {
 		ReportDao reportDao = new ReportDao();
 		reportDao.reportSeq = reportDto.getReportSeq();
 

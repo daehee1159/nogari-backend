@@ -2,20 +2,20 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.msm.nogari.core.mapper.CommonMapper">
-    <select id="getAppVersion" resultType="com.msm.nogari.core.dto.common.AppVersionDto">
+    <select id="getAppVersion" resultType="com.msm.nogari.core.dao.common.AppVersionDao">
         SELECT *
         FROM nogari_member.app_version
         ORDER BY regDt DESC LIMIT 1
     </select>
 
-    <select id="getAllHolidays" resultType="com.msm.nogari.core.dto.man_hour.ManHourDto">
+    <select id="getAllHolidays" resultType="com.msm.nogari.core.dao.man_hour.ManHourDao">
         SELECT
             *
         FROM nogari_man_hour.man_hour
         WHERE isHoliday = 'Y' ORDER BY startDt DESC
     </select>
 
-    <insert id="setHoliday" parameterType="com.msm.nogari.core.dto.man_hour.ManHourDto">
+    <insert id="setHoliday" parameterType="com.msm.nogari.core.dao.man_hour.ManHourDao">
         INSERT INTO nogari_man_hour.man_hour
         (
             memberSeq,
@@ -86,7 +86,7 @@
         <result property="standardDt" column="standardDt"/>
     </resultMap>
 
-    <insert id="reportBoard" parameterType="com.msm.nogari.core.dto.common.ReportDto">
+    <insert id="reportBoard" parameterType="com.msm.nogari.core.dao.common.ReportDao">
         INSERT INTO nogari_common.report
         (
             reportSeq,
