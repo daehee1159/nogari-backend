@@ -1,5 +1,6 @@
 package com.msm.nogari.core.dto.member;
 
+import com.msm.nogari.core.dao.member.MemberDao;
 import com.msm.nogari.core.enums.MemberStatus;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -14,7 +15,6 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberDto {
 	private Long memberSeq;
 
@@ -33,4 +33,26 @@ public class MemberDto {
 	private LocalDateTime regDt;
 
 	private String ipAddr;
+
+	public static MemberDto of(MemberDao memberDao) {
+		MemberDto memberDto = new MemberDto();
+
+		memberDto.memberSeq = memberDao.getMemberSeq();
+
+		memberDto.email = memberDao.getEmail();
+		memberDto.nickName = memberDao.getNickName();
+
+		memberDto.device = memberDao.getDevice();
+		memberDto.identifier = memberDao.getIdentifier();
+		memberDto.deviceToken = memberDao.getDeviceToken();
+		memberDto.status = memberDao.getStatus();
+		memberDto.userRole = memberDao.getUserRole();
+
+		memberDto.modDt = memberDao.getModDt();
+		memberDto.regDt = memberDao.getRegDt();
+
+		memberDto.ipAddr = memberDao.getIpAddr();
+
+		return memberDto;
+	}
 }

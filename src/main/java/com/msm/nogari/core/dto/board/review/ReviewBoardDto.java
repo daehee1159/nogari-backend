@@ -1,5 +1,6 @@
 package com.msm.nogari.core.dto.board.review;
 
+import com.msm.nogari.core.dao.board.review.ReviewBoardDao;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,4 +35,32 @@ public class ReviewBoardDto {
 
 	private LocalDateTime modDt;
 	private LocalDateTime regDt;
+
+	public static ReviewBoardDto of(ReviewBoardDao boardDao) {
+		ReviewBoardDto boardDto = new ReviewBoardDto();
+
+		boardDto.boardSeq = boardDao.getBoardSeq();
+
+		boardDto.title = boardDao.getTitle();
+		boardDto.rank = boardDao.getRank();
+		boardDto.period = boardDao.getPeriod();
+		boardDto.atmosphere = boardDao.getAtmosphere();
+		boardDto.content = boardDao.getContent();
+
+		boardDto.memberSeq = boardDao.getMemberSeq();
+		boardDto.nickname = boardDao.getNickname();
+
+		boardDto.viewCnt = boardDao.getViewCnt();
+		boardDto.likeCnt = boardDao.getLikeCnt();
+
+		boardDto.hotYN = boardDao.getHotYN();
+		boardDto.noticeYN = boardDao.getNoticeYN();
+
+		boardDto.deleteYN = boardDao.getDeleteYN();
+
+		boardDto.modDt = boardDao.getModDt();
+		boardDto.regDt = boardDao.getRegDt();
+
+		return boardDto;
+	}
 }

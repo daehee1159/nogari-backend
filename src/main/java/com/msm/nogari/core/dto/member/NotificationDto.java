@@ -1,5 +1,6 @@
 package com.msm.nogari.core.dto.member;
 
+import com.msm.nogari.core.dao.member.NotificationDao;
 import com.msm.nogari.core.enums.NotificationType;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,4 +26,21 @@ public class NotificationDto {
 	// 일단은 사용X 그러나 추후 notification bell icon 읽음 표시를 위해 남겨둠
 	private String readDt;
 
+	public static NotificationDto of(NotificationDao notificationDao) {
+		NotificationDto notificationDto = new NotificationDto();
+
+		notificationDto.notificationSeq = notificationDao.getNotificationSeq();
+
+		notificationDto.memberSeq = notificationDao.getMemberSeq();
+
+		notificationDto.type = notificationDao.getType();
+		notificationDto.message = notificationDao.getMessage();
+
+		notificationDto.boardSeq = notificationDao.getBoardSeq();
+		notificationDto.regDt = notificationDao.getRegDt();
+
+		notificationDto.readDt = notificationDao.getReadDt();
+
+		return notificationDto;
+	}
 }

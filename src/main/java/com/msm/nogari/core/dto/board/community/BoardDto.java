@@ -1,5 +1,6 @@
 package com.msm.nogari.core.dto.board.community;
 
+import com.msm.nogari.core.dao.board.community.BoardDao;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,4 +36,33 @@ public class BoardDto {
 
 	private LocalDateTime modDt;
 	private LocalDateTime regDt;
+
+	public static BoardDto of(BoardDao boardDao) {
+		BoardDto boardDto = new BoardDto();
+
+		boardDto.boardSeq = boardDao.getBoardSeq();
+
+		boardDto.title = boardDao.getTitle();
+		boardDto.content = boardDao.getContent();
+
+		boardDto.fileName1 = boardDao.getFileName1();
+		boardDto.fileName2 = boardDao.getFileName2();
+		boardDto.fileName3 = boardDao.getFileName3();
+
+		boardDto.memberSeq = boardDao.getMemberSeq();
+		boardDto.nickname = boardDao.getNickname();
+
+		boardDto.viewCnt = boardDao.getViewCnt();
+		boardDto.likeCnt = boardDao.getLikeCnt();
+
+		boardDto.hotYN = boardDao.getHotYN();
+		boardDto.noticeYN = boardDao.getNoticeYN();
+
+		boardDto.deleteYN = boardDao.getDeleteYN();
+
+		boardDto.modDt = boardDao.getModDt();
+		boardDto.regDt = boardDao.getRegDt();
+
+		return boardDto;
+	}
 }

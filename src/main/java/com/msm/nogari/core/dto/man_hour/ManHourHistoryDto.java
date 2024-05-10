@@ -1,5 +1,6 @@
 package com.msm.nogari.core.dto.man_hour;
 
+import com.msm.nogari.core.dao.man_hour.ManHourHistoryDao;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,4 +26,21 @@ public class ManHourHistoryDto {
 	private int totalEtcPrice;
 	private double totalAmount;
 
+	public static ManHourHistoryDto of(ManHourHistoryDao manHourHistoryDao) {
+		ManHourHistoryDto manHourHistoryDto = new ManHourHistoryDto();
+
+		manHourHistoryDto.manHourHistorySeq = manHourHistoryDao.getManHourHistorySeq();
+
+		manHourHistoryDto.memberSeq = manHourHistoryDao.getMemberSeq();
+
+		manHourHistoryDto.startDt = manHourHistoryDao.getStartDt();
+		manHourHistoryDto.endDt = manHourHistoryDao.getEndDt();
+
+		manHourHistoryDto.totalManHour = manHourHistoryDao.getTotalManHour();
+		manHourHistoryDto.totalUniPrice = manHourHistoryDao.getTotalUniPrice();
+		manHourHistoryDto.totalEtcPrice = manHourHistoryDao.getTotalEtcPrice();
+		manHourHistoryDto.totalAmount = manHourHistoryDao.getTotalAmount();
+
+		return manHourHistoryDto;
+	}
 }

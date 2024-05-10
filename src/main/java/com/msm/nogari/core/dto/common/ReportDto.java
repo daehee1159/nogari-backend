@@ -23,4 +23,20 @@ public class ReportDto {
 
 	private String regDt;
 
+	public static ReportDto of(ReportDao reportDao) {
+		ReportDto reportDto = new ReportDto();
+
+		reportDto.reportSeq = reportDao.getReportSeq();
+
+		reportDto.boardType = reportDao.getBoardType();
+		reportDto.boardSeq = reportDao.getBoardSeq();
+		reportDto.reportReason = reportDao.getReportReason();
+
+		reportDto.reporterMemberSeq = reportDao.getReporterMemberSeq();
+		reportDto.reportedMemberSeq = reportDao.getReportedMemberSeq();
+
+		reportDto.regDt = reportDao.getRegDt();
+
+		return reportDto;
+	}
 }

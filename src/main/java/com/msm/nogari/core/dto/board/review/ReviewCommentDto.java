@@ -1,5 +1,6 @@
 package com.msm.nogari.core.dto.board.review;
 
+import com.msm.nogari.core.dao.board.review.ReviewCommentDao;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,4 +23,23 @@ public class ReviewCommentDto {
 
 	private String modDt;
 	private String regDt;
+
+	public static ReviewCommentDto of(ReviewCommentDao commentDao) {
+		ReviewCommentDto commentDto = new ReviewCommentDto();
+
+		commentDto.commentSeq = commentDao.getCommentSeq();
+
+		commentDto.boardSeq = commentDao.getBoardSeq();
+		commentDto.memberSeq = commentDao.getMemberSeq();
+		commentDto.nickname = commentDao.getNickname();
+
+		commentDto.content = commentDao.getContent();
+
+		commentDto.deleteYN = commentDao.getDeleteYN();
+
+		commentDto.modDt = commentDao.getModDt();
+		commentDto.regDt = commentDao.getRegDt();
+
+		return commentDto;
+	}
 }

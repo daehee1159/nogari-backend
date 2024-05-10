@@ -1,5 +1,6 @@
 package com.msm.nogari.core.dto.board.community;
 
+import com.msm.nogari.core.dao.board.community.ChildCommentDao;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,4 +24,24 @@ public class ChildCommentDto {
 
 	private String modDt;
 	private String regDt;
+
+	public static ChildCommentDto of(ChildCommentDao childCommentDao) {
+		ChildCommentDto childCommentDto = new ChildCommentDto();
+
+		childCommentDto.childCommentSeq = childCommentDao.getChildCommentSeq();
+
+		childCommentDto.boardSeq = childCommentDao.getBoardSeq();
+		childCommentDto.commentSeq = childCommentDao.getCommentSeq();
+		childCommentDto.memberSeq = childCommentDao.getMemberSeq();
+		childCommentDto.nickname = childCommentDao.getNickname();
+
+		childCommentDto.content = childCommentDao.getContent();
+
+		childCommentDto.deleteYN = childCommentDao.getDeleteYN();
+
+		childCommentDto.modDt = childCommentDao.getModDt();
+		childCommentDto.regDt = childCommentDao.getRegDt();
+
+		return childCommentDto;
+	}
 }

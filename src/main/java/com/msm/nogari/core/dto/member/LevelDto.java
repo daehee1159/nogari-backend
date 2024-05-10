@@ -1,5 +1,6 @@
 package com.msm.nogari.core.dto.member;
 
+import com.msm.nogari.core.dao.member.LevelDao;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,4 +19,19 @@ public class LevelDto {
 
 	private String modDt;
 	private String regDt;
+
+	public static LevelDto of(LevelDao levelDao) {
+		LevelDto levelDto = new LevelDto();
+
+		levelDto.levelSeq = levelDao.getLevelSeq();
+
+		levelDto.memberSeq = levelDao.getMemberSeq();
+		levelDto.level = levelDao.getLevel();
+		levelDto.point = levelDao.getPoint();
+
+		levelDto.modDt = levelDao.getModDt();
+		levelDto.regDt = levelDao.getRegDt();
+
+		return levelDto;
+	}
 }
